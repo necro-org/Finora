@@ -1,5 +1,4 @@
 import {
-  Avatar,
   Grid,
   Box,
   Link,
@@ -8,7 +7,6 @@ import {
   Button,
   Stack,
 } from "@mui/material";
-import { LockOutlined as LockOutlinedIcon } from "@mui/icons-material";
 
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -61,9 +59,12 @@ export default function Register() {
           alignItems: "center",
         }}
       >
-        <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-          <LockOutlinedIcon />
-        </Avatar>
+        <Box
+          component="img"
+          src="/finora.svg"
+          alt="Finora"
+          sx={{ m: 1, width: 48, height: 48 }}
+        />
         <Typography component="h1" variant="h5">
           Cadastre
         </Typography>

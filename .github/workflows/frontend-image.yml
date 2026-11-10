@@ -15,5 +15,5 @@ jobs:
       contents: read
       packages: write
     with:
-      image: controle-financeiro-fe
+      image: finora-fe
       context: ./Frontend

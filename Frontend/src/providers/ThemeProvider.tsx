@@ -11,6 +11,20 @@ export default function ThemeProvider(props: ThemeProviderProps) {
   const { children } = props;
 
   const theme = createTheme({
+    palette: {
+      primary: {
+        light: "#10B981",
+        main: "#0F766E",
+        dark: "#115E59",
+        contrastText: "#FFFFFF",
+      },
+      secondary: {
+        light: "#FDE68A",
+        main: "#F59E0B",
+        dark: "#B45309",
+        contrastText: "#1F2937",
+      },
+    },
     components: {
       MuiButton: {
         defaultProps: {

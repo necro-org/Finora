@@ -15,6 +15,6 @@ jobs:
       contents: read
       packages: write
     with:
-      image: controle-financeiro-api
+      image: finora-api
       context: ./Backend
       dockerfile: ./Backend/Api/Dockerfile

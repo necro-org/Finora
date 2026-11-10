@@ -1,13 +1,4 @@
-import {
-  Avatar,
-  Link,
-  Box,
-  Typography,
-  Container,
-  Stack,
-  Button,
-} from "@mui/material";
-import { LockOutlined as LockOutlinedIcon } from "@mui/icons-material";
+import { Link, Box, Typography, Container, Stack, Button } from "@mui/material";
 import useAuth from "@hooks/useAuth";
 
 import { z } from "zod";
@@ -53,9 +44,12 @@ export default function Login() {
           alignItems: "center",
         }}
       >
-        <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-          <LockOutlinedIcon />
-        </Avatar>
+        <Box
+          component="img"
+          src="/finora.svg"
+          alt="Finora"
+          sx={{ m: 1, width: 48, height: 48 }}
+        />
         <Typography component="h1" variant="h5">
           Entre
         </Typography>

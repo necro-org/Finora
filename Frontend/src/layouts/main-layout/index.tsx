@@ -67,8 +67,8 @@ export default function MainLayout() {
       }}
     >
       <MainLayoutHeader
-        logo={<div>Logo</div>}
-        title=""
+        logo={<img src="/finora.svg" alt="Finora" width={32} height={32} />}
+        title="Finora"
         menuOpen={isNavigationExpanded}
         onToggleMenu={handleToggleHeaderMenu}
       />
