@@ -7,8 +7,9 @@ import Toolbar from "@mui/material/Toolbar";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { Link } from "react-router";
+
+import MainLayoutUserMenu from "./components/MainLayoutUserMenu";
 
 const AppBar = styled(MuiAppBar)(({ theme }) => ({
   borderWidth: 0,
@@ -61,9 +62,7 @@ export default function MainLayoutHeader({
           gap={0.5}
           sx={{ marginLeft: "auto" }}
         >
-          <IconButton>
-            <AccountCircleIcon />
-          </IconButton>
+          <MainLayoutUserMenu />
           <Tooltip title="Abrir menu">
             <IconButton
               onClick={onOpenMobileMenu}
