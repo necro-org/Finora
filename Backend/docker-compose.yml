@@ -1,6 +1,9 @@
+name: finora
+
 services:
-  api:
-    image: ${DOCKER_REGISTRY-}api
+  finora-api:
+    image: ${DOCKER_REGISTRY-}finora-api
+    container_name: finora-api
     build:
       context: .
       dockerfile: Api/Dockerfile
@@ -8,9 +11,10 @@ services:
       - "5000:8080"
       - "5001:8081"
     depends_on:
-      - db
-  db:
+      - finora-db
+  finora-db:
     image: postgres:18.1
+    container_name: finora-db
     ports:
       - 5432:5432
     environment:
@@ -19,7 +23,8 @@ services:
       POSTGRES_DB: finora
       PGDATA: /var/lib/postgresql/data
     volumes:
-      - finora-db:/var/lib/postgresql/data
+      - finora-db-data:/var/lib/postgresql/data
 
 volumes:
-  finora-db:
+  finora-db-data:
+    name: finora-db-data
