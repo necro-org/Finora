@@ -1,11 +1,5 @@
 import { useState } from "react";
-import {
-  Button,
-  Checkbox,
-  FormControlLabel,
-  Grid,
-  Typography,
-} from "@mui/material";
+import { Button, Checkbox, FormControlLabel, Grid } from "@mui/material";
 
 import CurrencyTextField from "@components/CurrencyTextField";
 import AutoCompleteTipo from "@components/AutoComplete/AutoCompleteTipo";
@@ -13,7 +7,7 @@ import AutoCompleteClassificacao from "@components/AutoComplete/AutoCompleteClas
 import DatePicker from "@components/DatePicker";
 import TextField from "@components/TextField";
 
-import { formatDate, formatMoney, formatToDayjs } from "@utils";
+import { formatDate, formatToDayjs } from "@utils";
 import { ClassificationEnum } from "../data/dtos/ClassificationEnum";
 import {
   getDefaultFilters,
@@ -22,11 +16,7 @@ import {
 } from "@stores/lancamentosFilterStore";
 import AutoCompleteAccount from "@components/AutoComplete/AutoCompleteAccount";
 
-interface Props {
-  valueTotal: number;
-}
-
-export default function FormFilter({ valueTotal }: Props) {
+export default function FormFilter() {
   const { filters, setFilters, clearFilter } = useLancamentosFilterStore();
 
   const [draft, setDraft] = useState<LancamentosFilterData>(filters);
@@ -52,7 +42,7 @@ export default function FormFilter({ valueTotal }: Props) {
         handleSearch();
       }}
     >
-      <Grid container spacing={1} sx={{ mb: 1 }}>
+      <Grid container spacing={1.5}>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <DatePicker
             label="Data inicial"
@@ -153,11 +143,8 @@ export default function FormFilter({ valueTotal }: Props) {
             label="Não confirmados"
           />
         </Grid>
-        <Grid size={{ xs: 6 }}>
-          <Typography>Valor total: {formatMoney(valueTotal)}</Typography>
-        </Grid>
         <Grid
-          size={{ xs: 6 }}
+          size={{ xs: 12 }}
           sx={{ display: "flex", justifyContent: "end", gap: 1 }}
         >
           <Button variant="outlined" onClick={handleClear}>

@@ -1,5 +1,6 @@
-import { Link, Box, Typography, Container, Stack, Button } from "@mui/material";
+import { Link, Box, Typography, Stack, Button } from "@mui/material";
 import useAuth from "@hooks/useAuth";
+import AuthCard from "@components/AuthCard";
 
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -35,71 +36,59 @@ export default function Login() {
   }
 
   return (
-    <Container component="main" maxWidth="xs">
-      <Box
-        sx={{
-          marginTop: 8,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <Box
-          component="img"
-          src="/finora.svg"
-          alt="Finora"
-          sx={{ m: 1, width: 48, height: 48 }}
-        />
-        <Typography component="h1" variant="h5">
-          Entre
+    <AuthCard
+      title="Bem-vindo de volta"
+      subtitle="Entre para acompanhar suas finanças"
+    >
+      <Box sx={{ width: "100%" }}>
+        <FormProvider {...form}>
+          <Stack gap={1.5}>
+            <TextField
+              id="email"
+              type="email"
+              name="email"
+              placeholder="seuemail@email.com"
+              autoComplete="email"
+              autoFocus
+              required
+              variant="outlined"
+              sx={{ ariaLabel: "email" }}
+              label="Email"
+            />
+
+            <TextFieldPassword
+              name="password"
+              autoComplete="current-password"
+              required
+              label="Senha"
+            />
+          </Stack>
+
+          <Button
+            loading={isPending}
+            type="submit"
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
+            fullWidth
+            onClick={form.handleSubmit(onSubmit)}
+          >
+            Entre
+          </Button>
+        </FormProvider>
+
+        <Typography variant="body2" color="text.secondary" textAlign="center">
+          Não tem uma conta?{" "}
+          <Link
+            component="button"
+            type="button"
+            onClick={() => goToRegistrar()}
+            variant="body2"
+            fontWeight={600}
+          >
+            Cadastre-se
+          </Link>
         </Typography>
-        <Box sx={{ mt: 1, width: "100%" }}>
-          <FormProvider {...form}>
-            <Stack gap={1}>
-              <TextField
-                id="email"
-                type="email"
-                name="email"
-                placeholder="seuemail@email.com"
-                autoComplete="email"
-                autoFocus
-                required
-                variant="outlined"
-                sx={{ ariaLabel: "email" }}
-                label="Email"
-              />
-
-              <TextFieldPassword
-                name="password"
-                autoComplete="current-password"
-                required
-                label="Senha"
-              />
-            </Stack>
-
-            <Button
-              loading={isPending}
-              type="submit"
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-              fullWidth
-              onClick={form.handleSubmit(onSubmit)}
-            >
-              Entre
-            </Button>
-          </FormProvider>
-
-          <div className="flex items-center justify-center sm:justify-start">
-            <Link
-              className="hover:cursor-pointer"
-              onClick={() => goToRegistrar()}
-              variant="body2"
-            >
-              Não tem uma conta? Cadastre
-            </Link>
-          </div>
-        </Box>
       </Box>
-    </Container>
+    </AuthCard>
   );
 }

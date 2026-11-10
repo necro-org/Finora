@@ -12,41 +12,45 @@ import MainLayoutSidebar from "./MainLayoutSidebar";
 
 import useAuth from "@hooks/useAuth";
 
+const SIDEBAR_EXPANDED_STORAGE_KEY = "finora:sidebar-expanded";
+
+function readStoredSidebarExpanded() {
+  try {
+    return localStorage.getItem(SIDEBAR_EXPANDED_STORAGE_KEY) !== "false";
+  } catch {
+    return true;
+  }
+}
+
+function storeSidebarExpanded(expanded: boolean) {
+  try {
+    localStorage.setItem(SIDEBAR_EXPANDED_STORAGE_KEY, String(expanded));
+  } catch {
+    return;
+  }
+}
+
 export default function MainLayout() {
   const theme = useTheme();
   const { token } = useAuth();
 
-  const [isDesktopNavigationExpanded, setIsDesktopNavigationExpanded] =
-    React.useState(true);
-  const [isMobileNavigationExpanded, setIsMobileNavigationExpanded] =
-    React.useState(false);
+  const isOverSmViewport = useMediaQuery(theme.breakpoints.up("sm"));
 
-  const isOverMdViewport = useMediaQuery(theme.breakpoints.up("md"));
+  const [isDesktopExpanded, setIsDesktopExpanded] = React.useState(
+    readStoredSidebarExpanded,
+  );
+  const [isMobileOpen, setIsMobileOpen] = React.useState(false);
 
-  const isNavigationExpanded = isOverMdViewport
-    ? isDesktopNavigationExpanded
-    : isMobileNavigationExpanded;
-
-  const setIsNavigationExpanded = React.useCallback(
-    (newExpanded: boolean) => {
-      if (isOverMdViewport) {
-        setIsDesktopNavigationExpanded(newExpanded);
+  const setExpanded = React.useCallback(
+    (expanded: boolean) => {
+      if (isOverSmViewport) {
+        setIsDesktopExpanded(expanded);
+        storeSidebarExpanded(expanded);
       } else {
-        setIsMobileNavigationExpanded(newExpanded);
+        setIsMobileOpen(expanded);
       }
     },
-    [
-      isOverMdViewport,
-      setIsDesktopNavigationExpanded,
-      setIsMobileNavigationExpanded,
-    ],
-  );
-
-  const handleToggleHeaderMenu = React.useCallback(
-    (isExpanded: boolean) => {
-      setIsNavigationExpanded(isExpanded);
-    },
-    [setIsNavigationExpanded],
+    [isOverSmViewport],
   );
 
   const layoutRef = React.useRef<HTMLDivElement>(null);
@@ -66,15 +70,10 @@ export default function MainLayout() {
         width: "100vw",
       }}
     >
-      <MainLayoutHeader
-        logo={<img src="/finora.svg" alt="Finora" width={32} height={32} />}
-        title="Finora"
-        menuOpen={isNavigationExpanded}
-        onToggleMenu={handleToggleHeaderMenu}
-      />
+      <MainLayoutHeader onOpenMobileMenu={() => setIsMobileOpen(true)} />
       <MainLayoutSidebar
-        expanded={isNavigationExpanded}
-        setExpanded={setIsNavigationExpanded}
+        expanded={isOverSmViewport ? isDesktopExpanded : isMobileOpen}
+        setExpanded={setExpanded}
         containerRef={layoutRef}
       />
       <Box

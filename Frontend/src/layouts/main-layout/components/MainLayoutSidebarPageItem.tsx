@@ -1,253 +1,100 @@
 import * as React from "react";
-import type { SxProps, Theme } from "@mui/material/styles";
-import Avatar from "@mui/material/Avatar";
-import Box from "@mui/material/Box";
-import Collapse from "@mui/material/Collapse";
-import Grow from "@mui/material/Grow";
+import { alpha } from "@mui/material/styles";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import Paper from "@mui/material/Paper";
-import Typography from "@mui/material/Typography";
-import type {} from "@mui/material/themeCssVarsAugmentation";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import Tooltip from "@mui/material/Tooltip";
 import { Link } from "react-router";
+
 import MainLayoutSidebarContext from "../context/MainLayoutSidebarContext";
-import { MINI_DRAWER_WIDTH } from "../helpers/helper";
 
 export interface MainLayoutSidebarPageItemProps {
-  id: string;
   title: string;
-  icon?: React.ReactNode;
+  icon: React.ReactNode;
   href: string;
-  action?: React.ReactNode;
-  defaultExpanded?: boolean;
-  expanded?: boolean;
   selected?: boolean;
-  disabled?: boolean;
-  nestedNavigation?: React.ReactNode;
 }
 
 export default function MainLayoutSidebarPageItem({
-  id,
   title,
   icon,
   href,
-  action,
-  defaultExpanded = false,
-  expanded = defaultExpanded,
   selected = false,
-  disabled = false,
-  nestedNavigation,
 }: MainLayoutSidebarPageItemProps) {
   const sidebarContext = React.useContext(MainLayoutSidebarContext);
   if (!sidebarContext) {
     throw new Error("Sidebar context was used without a provider.");
   }
-  const {
-    onPageItemClick,
-    mini = false,
-    fullyExpanded = true,
-    fullyCollapsed = false,
-  } = sidebarContext;
-
-  const [isHovered, setIsHovered] = React.useState(false);
-
-  const handleClick = React.useCallback(() => {
-    if (onPageItemClick) {
-      onPageItemClick(id, !!nestedNavigation);
-    }
-  }, [onPageItemClick, id, nestedNavigation]);
-
-  let nestedNavigationCollapseSx: SxProps<Theme> = { display: "none" };
-  if (mini && fullyCollapsed) {
-    nestedNavigationCollapseSx = {
-      fontSize: 18,
-      position: "absolute",
-      top: "41.5%",
-      right: "2px",
-      transform: "translateY(-50%) rotate(-90deg)",
-    };
-  } else if (!mini && fullyExpanded) {
-    nestedNavigationCollapseSx = {
-      ml: 0.5,
-      fontSize: 20,
-      transform: `rotate(${expanded ? 0 : -90}deg)`,
-      transition: (theme: Theme) =>
-        theme.transitions.create("transform", {
-          easing: theme.transitions.easing.sharp,
-          duration: 100,
-        }),
-    };
-  }
-
-  const hasExternalHref = href
-    ? href.startsWith("http://") || href.startsWith("https://")
-    : false;
-
-  const LinkComponent = hasExternalHref ? "a" : Link;
-
-  const miniNestedNavigationSidebarContextValue = React.useMemo(() => {
-    return {
-      onPageItemClick: onPageItemClick ?? (() => {}),
-      mini: false,
-      fullyExpanded: true,
-      fullyCollapsed: false,
-      hasDrawerTransitions: false,
-    };
-  }, [onPageItemClick]);
+  const { mini, onPageItemClick } = sidebarContext;
 
   return (
-    <React.Fragment>
-      <ListItem
-        disablePadding
-        {...(nestedNavigation && mini
-          ? {
-              onMouseEnter: () => {
-                setIsHovered(true);
-              },
-              onMouseLeave: () => {
-                setIsHovered(false);
-              },
-            }
-          : {})}
-        sx={{
-          display: "block",
-          py: 0,
-          px: 1,
-          overflowX: "hidden",
-        }}
-      >
+    <ListItem disablePadding sx={{ display: "block", px: 1.5, py: 0.25 }}>
+      <Tooltip title={mini ? title : ""} placement="right" disableInteractive>
         <ListItemButton
+          component={Link}
+          to={href}
           selected={selected}
-          disabled={disabled}
-          sx={{
-            height: mini ? 50 : "auto",
-          }}
-          {...(nestedNavigation && !mini
-            ? {
-                onClick: handleClick,
-              }
-            : {})}
-          {...(!nestedNavigation
-            ? {
-                LinkComponent,
-                ...(hasExternalHref
-                  ? {
-                      target: "_blank",
-                      rel: "noopener noreferrer",
-                    }
-                  : {}),
-                to: href,
-                onClick: handleClick,
-              }
-            : {})}
+          onClick={onPageItemClick}
+          aria-label={title}
+          sx={(theme) => ({
+            position: "relative",
+            minHeight: 42,
+            px: 2,
+            borderRadius: 2.5,
+            justifyContent: mini ? "center" : "flex-start",
+            color: theme.palette.text.secondary,
+            transition: theme.transitions.create(
+              ["background-color", "color"],
+              { duration: theme.transitions.duration.shortest },
+            ),
+            "&:hover": {
+              backgroundColor: alpha(theme.palette.primary.main, 0.06),
+              color: theme.palette.text.primary,
+              "& .MuiListItemIcon-root": {
+                color: theme.palette.primary.main,
+              },
+            },
+            "&.Mui-selected": {
+              color: theme.palette.primary.dark,
+              backgroundColor: alpha(theme.palette.primary.main, 0.12),
+              "&::before": {
+                content: '""',
+                position: "absolute",
+                left: -12,
+                top: 8,
+                bottom: 8,
+                width: 4,
+                borderRadius: "0 4px 4px 0",
+                backgroundColor: theme.palette.primary.main,
+              },
+            },
+          })}
         >
-          {icon || mini ? (
-            <Box
-              sx={
-                mini
-                  ? {
-                      position: "absolute",
-                      left: "50%",
-                      top: "calc(50% - 6px)",
-                      transform: "translate(-50%, -50%)",
-                    }
-                  : {}
-              }
-            >
-              <ListItemIcon
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: mini ? "center" : "auto",
-                }}
-              >
-                {icon ?? null}
-                {!icon && mini ? (
-                  <Avatar
-                    sx={{
-                      fontSize: 10,
-                      height: 16,
-                      width: 16,
-                    }}
-                  >
-                    {title
-                      .split(" ")
-                      .slice(0, 2)
-                      .map((titleWord) => titleWord.charAt(0).toUpperCase())}
-                  </Avatar>
-                ) : null}
-              </ListItemIcon>
-              {mini ? (
-                <Typography
-                  variant="caption"
-                  sx={{
-                    position: "absolute",
-                    bottom: -18,
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                    fontSize: 10,
-                    fontWeight: 500,
-                    textAlign: "center",
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    maxWidth: MINI_DRAWER_WIDTH - 28,
-                  }}
-                >
-                  {title}
-                </Typography>
-              ) : null}
-            </Box>
-          ) : null}
+          <ListItemIcon
+            sx={{
+              minWidth: 0,
+              mr: mini ? 0 : 1.75,
+              color: selected ? "primary.main" : "inherit",
+              "& svg": { fontSize: 20 },
+            }}
+          >
+            {icon}
+          </ListItemIcon>
           {!mini ? (
             <ListItemText
               primary={title}
-              sx={{
-                whiteSpace: "nowrap",
-                zIndex: 1,
+              slotProps={{
+                primary: {
+                  variant: "body2",
+                  noWrap: true,
+                  fontWeight: selected ? 600 : 500,
+                },
               }}
             />
           ) : null}
-          {action && !mini && fullyExpanded ? action : null}
-          {nestedNavigation ? (
-            <ExpandMoreIcon sx={nestedNavigationCollapseSx} />
-          ) : null}
         </ListItemButton>
-        {nestedNavigation && mini ? (
-          <Grow in={isHovered}>
-            <Box
-              sx={{
-                position: "fixed",
-                left: MINI_DRAWER_WIDTH - 2,
-                pl: "6px",
-              }}
-            >
-              <Paper
-                elevation={8}
-                sx={{
-                  pt: 0.2,
-                  pb: 0.2,
-                  transform: "translateY(-50px)",
-                }}
-              >
-                <MainLayoutSidebarContext.Provider
-                  value={miniNestedNavigationSidebarContextValue}
-                >
-                  {nestedNavigation}
-                </MainLayoutSidebarContext.Provider>
-              </Paper>
-            </Box>
-          </Grow>
-        ) : null}
-      </ListItem>
-      {nestedNavigation && !mini ? (
-        <Collapse in={expanded} timeout="auto" unmountOnExit>
-          {nestedNavigation}
-        </Collapse>
-      ) : null}
-    </React.Fragment>
+      </Tooltip>
+    </ListItem>
   );
 }

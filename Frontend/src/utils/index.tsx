@@ -9,6 +9,13 @@ export function formatMoney(value: number | null | undefined) {
   }).format(value);
 }
 
+export function formatCurrency(value: number | null | undefined) {
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(value ?? 0);
+}
+
 export function formatDateToShow(value: string | null | undefined) {
   if (!value) return "";
   return dayjs(value, "YYYY-MM-DD").format("DD/MM/YYYY");

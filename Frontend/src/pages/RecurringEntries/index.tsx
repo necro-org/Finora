@@ -1,6 +1,5 @@
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
-import Chip from "@mui/material/Chip";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -13,7 +12,10 @@ import useRecurringEntriesList from "./data/useRecurringEntriesList";
 import useRecurringEntriesDelete from "./data/useRecurringEntriesDelete";
 import { useGoTo } from "@hooks/useGoTo";
 import { confirmDelete } from "@libs/alert";
-import { formatDateToShow, formatMoney } from "@utils";
+import Chip from "@mui/material/Chip";
+import { formatDateToShow } from "@utils";
+import AmountText from "@components/AmountText";
+import ClassificationChip from "@components/ClassificationChip";
 
 export default function RecurringEntries() {
   const pageTitle = "Lançamentos Recorrentes";
@@ -49,19 +51,22 @@ export default function RecurringEntries() {
           {
             field: "amount",
             headerName: "Valor",
-            width: 120,
-            valueFormatter: (value) => formatMoney(value),
+            width: 130,
+            align: "right",
+            headerAlign: "right",
+            renderCell: ({ row }) => (
+              <AmountText
+                amount={row.amount}
+                classification={row.classification}
+              />
+            ),
           },
           {
             field: "classification",
             headerName: "Classificação",
             width: 130,
             renderCell: ({ row }) => (
-              <Chip
-                label={row.classification === "Expense" ? "Despesa" : "Receita"}
-                color={row.classification === "Expense" ? "error" : "success"}
-                size="small"
-              />
+              <ClassificationChip classification={row.classification} />
             ),
           },
           {

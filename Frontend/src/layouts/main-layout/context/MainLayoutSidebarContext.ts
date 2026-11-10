@@ -1,11 +1,8 @@
 import * as React from "react";
 
 const MainLayoutSidebarContext = React.createContext<{
-  onPageItemClick: (id: string, hasNestedNavigation: boolean) => void;
+  onPageItemClick: () => void;
   mini: boolean;
-  fullyExpanded: boolean;
-  fullyCollapsed: boolean;
-  hasDrawerTransitions: boolean;
 } | null>(null);
 
 export default MainLayoutSidebarContext;

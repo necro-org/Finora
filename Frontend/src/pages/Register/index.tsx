@@ -1,12 +1,5 @@
-import {
-  Grid,
-  Box,
-  Link,
-  Typography,
-  Container,
-  Button,
-  Stack,
-} from "@mui/material";
+import { Box, Link, Typography, Button, Stack } from "@mui/material";
+import AuthCard from "@components/AuthCard";
 
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -50,83 +43,69 @@ export default function Register() {
   }
 
   return (
-    <Container component="main" maxWidth="xs">
-      <Box
-        sx={{
-          marginTop: 8,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <Box
-          component="img"
-          src="/finora.svg"
-          alt="Finora"
-          sx={{ m: 1, width: 48, height: 48 }}
-        />
-        <Typography component="h1" variant="h5">
-          Cadastre
+    <AuthCard
+      title="Crie sua conta"
+      subtitle="Comece a organizar suas finanças em poucos minutos"
+    >
+      <Box sx={{ width: "100%" }}>
+        <FormProvider {...form}>
+          <Stack gap={1.5}>
+            <TextField
+              name="name"
+              autoComplete="given-name"
+              autoFocus
+              required
+              sx={{ ariaLabel: "nome" }}
+              label="Nome"
+            />
+            <TextField
+              type="email"
+              name="email"
+              placeholder="seuemail@email.com"
+              autoComplete="email"
+              required
+              sx={{ ariaLabel: "email" }}
+              label="Email"
+            />
+            <TextFieldPassword
+              required
+              label="Senha"
+              name="password"
+              autoComplete="new-password"
+            />
+            <TextFieldPassword
+              required
+              name="confirmPassword"
+              label="Confirme a senha"
+              autoComplete="new-password"
+            />
+          </Stack>
+
+          <Button
+            loading={isPending}
+            variant="contained"
+            type="submit"
+            sx={{ mt: 3, mb: 2 }}
+            fullWidth
+            onClick={form.handleSubmit(onSubmit)}
+          >
+            Cadastrar
+          </Button>
+        </FormProvider>
+
+        <Typography variant="body2" color="text.secondary" textAlign="center">
+          Já tem uma conta?{" "}
+          <Link
+            component="button"
+            type="button"
+            onClick={() => goToLogin()}
+            variant="body2"
+            fontWeight={600}
+          >
+            Entre
+          </Link>
         </Typography>
-        <Box sx={{ mt: 3, width: "100%" }}>
-          <FormProvider {...form}>
-            <Stack gap={1}>
-              <TextField
-                name="name"
-                autoComplete="given-name"
-                autoFocus
-                required
-                sx={{ ariaLabel: "nome" }}
-                label="Nome"
-              />
-              <TextField
-                type="email"
-                name="email"
-                placeholder="seuemail@email.com"
-                autoComplete="email"
-                required
-                sx={{ ariaLabel: "email" }}
-                label="Email"
-              />
-              <TextFieldPassword
-                required
-                label="Senha"
-                name="password"
-                autoComplete="new-password"
-              />
-              <TextFieldPassword
-                required
-                name="confirmPassword"
-                label="Confirme a senha"
-                autoComplete="new-password"
-              />
-            </Stack>
-
-            <Button
-              loading={isPending}
-              variant="contained"
-              type="submit"
-              sx={{ mt: 3, mb: 2 }}
-              fullWidth
-              onClick={form.handleSubmit(onSubmit)}
-            >
-              Cadastrar
-            </Button>
-          </FormProvider>
-
-          <Grid container justifyContent="flex-end">
-            <Grid>
-              <Link
-                className="hover:cursor-pointer"
-                onClick={() => goToLogin()}
-                variant="body2"
-              >
-                Já tem uma conta? Entre
-              </Link>
-            </Grid>
-          </Grid>
-        </Box>
       </Box>
-    </Container>
+    </AuthCard>
   );
 }

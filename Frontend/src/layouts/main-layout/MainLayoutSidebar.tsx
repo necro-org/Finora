@@ -1,256 +1,247 @@
 import * as React from "react";
-import { useTheme } from "@mui/material/styles";
+import { alpha, useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Box from "@mui/material/Box";
+import Divider from "@mui/material/Divider";
 import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import Stack from "@mui/material/Stack";
 import Toolbar from "@mui/material/Toolbar";
-import type {} from "@mui/material/themeCssVarsAugmentation";
-import BarChartIcon from "@mui/icons-material/BarChart";
-import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
-import FeedIcon from "@mui/icons-material/Feed";
-import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
-import RepeatIcon from "@mui/icons-material/Repeat";
+import Tooltip from "@mui/material/Tooltip";
+import Typography from "@mui/material/Typography";
+import SpaceDashboardRoundedIcon from "@mui/icons-material/SpaceDashboardRounded";
+import ReceiptLongRoundedIcon from "@mui/icons-material/ReceiptLongRounded";
+import EventRepeatRoundedIcon from "@mui/icons-material/EventRepeatRounded";
+import CategoryRoundedIcon from "@mui/icons-material/CategoryRounded";
+import AccountBalanceRoundedIcon from "@mui/icons-material/AccountBalanceRounded";
+import KeyboardDoubleArrowLeftRoundedIcon from "@mui/icons-material/KeyboardDoubleArrowLeftRounded";
+import KeyboardDoubleArrowRightRoundedIcon from "@mui/icons-material/KeyboardDoubleArrowRightRounded";
 
 import { matchPath, useLocation } from "react-router";
 
 import MainLayoutSidebarContext from "./context/MainLayoutSidebarContext";
-
 import MainLayoutSidebarPageItem from "./components/MainLayoutSidebarPageItem";
 import MainLayoutSidebarHeaderItem from "./components/MainLayoutSidebarHeaderItem";
 
 import {
   DRAWER_WIDTH,
   MINI_DRAWER_WIDTH,
-  getDrawerSxTransitionMixin,
   getDrawerWidthTransitionMixin,
 } from "./helpers/helper";
 
+const NAVIGATION = [
+  {
+    section: "Visão geral",
+    items: [
+      { title: "Painel", href: "/painel", icon: <SpaceDashboardRoundedIcon /> },
+    ],
+  },
+  {
+    section: "Movimentações",
+    items: [
+      {
+        title: "Lançamentos",
+        href: "/lancamentos",
+        icon: <ReceiptLongRoundedIcon />,
+      },
+      {
+        title: "Recorrentes",
+        href: "/lancamentos-recorrentes",
+        icon: <EventRepeatRoundedIcon />,
+      },
+    ],
+  },
+  {
+    section: "Cadastros",
+    items: [
+      { title: "Tipos", href: "/tipos", icon: <CategoryRoundedIcon /> },
+      { title: "Contas", href: "/contas", icon: <AccountBalanceRoundedIcon /> },
+    ],
+  },
+];
+
 export interface MainLayoutSidebarProps {
-  expanded?: boolean;
+  expanded: boolean;
   setExpanded: (expanded: boolean) => void;
-  disableCollapsibleSidebar?: boolean;
   containerRef?: React.RefObject<HTMLDivElement | null>;
 }
 
 export default function MainLayoutSidebar({
-  expanded = true,
+  expanded,
   setExpanded,
-  disableCollapsibleSidebar = false,
   containerRef,
 }: MainLayoutSidebarProps) {
   const theme = useTheme();
-
   const { pathname } = useLocation();
-
   const isOverSmViewport = useMediaQuery(theme.breakpoints.up("sm"));
-  const isOverMdViewport = useMediaQuery(theme.breakpoints.up("md"));
 
-  const [isFullyExpanded, setIsFullyExpanded] = React.useState(expanded);
-  const [isFullyCollapsed, setIsFullyCollapsed] = React.useState(!expanded);
+  const mini = isOverSmViewport && !expanded;
 
-  React.useEffect(() => {
-    if (expanded) {
-      const drawerWidthTransitionTimeout = setTimeout(() => {
-        setIsFullyExpanded(true);
-      }, theme.transitions.duration.enteringScreen);
-
-      return () => clearTimeout(drawerWidthTransitionTimeout);
-    }
-
-    setIsFullyExpanded(false);
-
-    return () => {};
-  }, [expanded, theme.transitions.duration.enteringScreen]);
-
-  React.useEffect(() => {
-    if (!expanded) {
-      const drawerWidthTransitionTimeout = setTimeout(() => {
-        setIsFullyCollapsed(true);
-      }, theme.transitions.duration.leavingScreen);
-
-      return () => clearTimeout(drawerWidthTransitionTimeout);
-    }
-
-    setIsFullyCollapsed(false);
-
-    return () => {};
-  }, [expanded, theme.transitions.duration.leavingScreen]);
-
-  const mini = !disableCollapsibleSidebar && !expanded;
-
-  const handleSetSidebarExpanded = React.useCallback(
-    (newExpanded: boolean) => () => {
-      setExpanded(newExpanded);
-    },
-    [setExpanded],
+  const sidebarContextValue = React.useMemo(
+    () => ({
+      mini,
+      onPageItemClick: () => {
+        if (!isOverSmViewport) {
+          setExpanded(false);
+        }
+      },
+    }),
+    [mini, isOverSmViewport, setExpanded],
   );
 
-  const handlePageItemClick = React.useCallback(
-    (_: string, hasNestedNavigation: boolean) => {
-      if (!isOverSmViewport && !hasNestedNavigation) {
-        setExpanded(false);
-      }
-    },
-    [setExpanded, isOverSmViewport],
+  const isSelected = (href: string) =>
+    !!matchPath({ path: href, end: false }, pathname);
+
+  const navigation = (
+    <List disablePadding sx={{ pt: 1 }}>
+      {NAVIGATION.map((group) => (
+        <React.Fragment key={group.section}>
+          <MainLayoutSidebarHeaderItem>
+            {group.section}
+          </MainLayoutSidebarHeaderItem>
+          {group.items.map((item) => (
+            <MainLayoutSidebarPageItem
+              key={item.href}
+              title={item.title}
+              icon={item.icon}
+              href={item.href}
+              selected={isSelected(item.href)}
+            />
+          ))}
+        </React.Fragment>
+      ))}
+    </List>
   );
 
-  const hasDrawerTransitions =
-    isOverSmViewport && (!disableCollapsibleSidebar || isOverMdViewport);
+  const collapseLabel = expanded ? "Recolher menu" : "Expandir menu";
 
-  const getDrawerContent = React.useCallback(
-    (viewport: "phone" | "tablet" | "desktop") => (
-      <React.Fragment>
-        <Toolbar />
-        <Box
-          component="nav"
-          aria-label={`${viewport.charAt(0).toUpperCase()}${viewport.slice(1)}`}
+  const collapseButton = (
+    <Box sx={{ p: 1.5 }}>
+      <Tooltip title={mini ? collapseLabel : ""} placement="right">
+        <ListItemButton
+          onClick={() => setExpanded(!expanded)}
+          aria-label={collapseLabel}
           sx={{
-            height: "100%",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-            overflow: "auto",
-            scrollbarGutter: mini ? "stable" : "auto",
-            overflowX: "hidden",
-            pt: !mini ? 0 : 2,
-            ...(hasDrawerTransitions
-              ? getDrawerSxTransitionMixin(isFullyExpanded, "padding")
-              : {}),
+            minHeight: 40,
+            px: 2,
+            borderRadius: 2.5,
+            justifyContent: mini ? "center" : "flex-start",
+            color: "text.secondary",
+            "&:hover": {
+              color: "primary.main",
+              backgroundColor: alpha(theme.palette.primary.main, 0.06),
+            },
           }}
         >
-          <List
-            dense
+          <ListItemIcon
             sx={{
-              padding: mini ? 0 : 0.5,
-              mb: 4,
-              width: mini ? MINI_DRAWER_WIDTH : "auto",
+              minWidth: 0,
+              mr: mini ? 0 : 1.75,
+              color: "inherit",
+              "& svg": { fontSize: 20 },
             }}
           >
-            <MainLayoutSidebarHeaderItem>Menu</MainLayoutSidebarHeaderItem>
-            <MainLayoutSidebarPageItem
-              id=""
-              title="Painel"
-              icon={<BarChartIcon />}
-              href="/painel"
-              selected={pathname === "/"}
+            {expanded ? (
+              <KeyboardDoubleArrowLeftRoundedIcon />
+            ) : (
+              <KeyboardDoubleArrowRightRoundedIcon />
+            )}
+          </ListItemIcon>
+          {!mini ? (
+            <ListItemText
+              primary={collapseLabel}
+              slotProps={{
+                primary: { variant: "body2", fontWeight: 500, noWrap: true },
+              }}
             />
-
-            <MainLayoutSidebarPageItem
-              id="lancamentos"
-              title="Lançamentos"
-              icon={<PointOfSaleIcon />}
-              href="/lancamentos"
-              selected={!!matchPath("/lancamentos", pathname)}
-            />
-            <MainLayoutSidebarPageItem
-              id="tipos"
-              title="Tipos"
-              icon={<FeedIcon />}
-              href="/tipos"
-              selected={!!matchPath("/tipos", pathname)}
-            />
-            <MainLayoutSidebarPageItem
-              id="contas"
-              title="Contas"
-              icon={<AccountBalanceIcon />}
-              href="/contas"
-              selected={!!matchPath("/contas", pathname)}
-            />
-            <MainLayoutSidebarPageItem
-              id="lancamentos-recorrentes"
-              title="Recorrentes"
-              icon={<RepeatIcon />}
-              href="/lancamentos-recorrentes"
-              selected={!!matchPath("/lancamentos-recorrentes", pathname)}
-            />
-          </List>
-        </Box>
-      </React.Fragment>
-    ),
-    [mini, hasDrawerTransitions, isFullyExpanded, pathname],
+          ) : null}
+        </ListItemButton>
+      </Tooltip>
+    </Box>
   );
 
-  const getDrawerSharedSx = React.useCallback(
-    (isTemporary: boolean) => {
-      const drawerWidth = mini ? MINI_DRAWER_WIDTH : DRAWER_WIDTH;
+  const paperBackground = `linear-gradient(180deg, ${alpha(
+    theme.palette.primary.main,
+    0.05,
+  )} 0%, ${theme.palette.background.paper} 45%)`;
 
-      return {
-        displayPrint: "none",
-        width: drawerWidth,
-        flexShrink: 0,
-        ...getDrawerWidthTransitionMixin(expanded),
-        ...(isTemporary ? { position: "absolute" } : {}),
-        [`& .MuiDrawer-paper`]: {
-          position: "absolute",
-          width: drawerWidth,
-          boxSizing: "border-box",
-          backgroundImage: "none",
-          ...getDrawerWidthTransitionMixin(expanded),
-        },
-      };
-    },
-    [expanded, mini],
-  );
-
-  const sidebarContextValue = React.useMemo(() => {
-    return {
-      onPageItemClick: handlePageItemClick,
-      mini,
-      fullyExpanded: isFullyExpanded,
-      fullyCollapsed: isFullyCollapsed,
-      hasDrawerTransitions,
-    };
-  }, [
-    handlePageItemClick,
-    mini,
-    isFullyExpanded,
-    isFullyCollapsed,
-    hasDrawerTransitions,
-  ]);
+  const drawerWidth = mini ? MINI_DRAWER_WIDTH : DRAWER_WIDTH;
 
   return (
     <MainLayoutSidebarContext.Provider value={sidebarContextValue}>
       <Drawer
         container={() => containerRef?.current ?? document.body}
         variant="temporary"
-        open={expanded}
-        onClose={handleSetSidebarExpanded(false)}
-        ModalProps={{
-          keepMounted: true, // Better open performance on mobile.
-        }}
+        open={!isOverSmViewport && expanded}
+        onClose={() => setExpanded(false)}
+        ModalProps={{ keepMounted: true }}
         sx={{
-          display: {
-            xs: "block",
-            sm: disableCollapsibleSidebar ? "block" : "none",
-            md: "none",
+          display: { xs: "block", sm: "none" },
+          "& .MuiDrawer-paper": {
+            width: DRAWER_WIDTH,
+            boxSizing: "border-box",
+            backgroundImage: paperBackground,
           },
-          ...getDrawerSharedSx(true),
         }}
       >
-        {getDrawerContent("phone")}
+        <Toolbar disableGutters sx={{ px: "22px" }}>
+          <Stack direction="row" alignItems="center" gap={1.25}>
+            <Box
+              component="img"
+              src="/finora.svg"
+              alt="Finora"
+              sx={{ width: 32, height: 32 }}
+            />
+            <Typography variant="h6" color="primary.main" fontWeight={700}>
+              Finora
+            </Typography>
+          </Stack>
+        </Toolbar>
+        <Divider />
+        <Box
+          component="nav"
+          aria-label="Menu principal"
+          sx={{ overflowY: "auto" }}
+        >
+          {navigation}
+        </Box>
       </Drawer>
+
       <Drawer
         variant="permanent"
         sx={{
-          display: {
-            xs: "none",
-            sm: disableCollapsibleSidebar ? "none" : "block",
-            md: "none",
+          display: { xs: "none", sm: "block" },
+          width: drawerWidth,
+          flexShrink: 0,
+          ...getDrawerWidthTransitionMixin(expanded),
+          "& .MuiDrawer-paper": {
+            position: "absolute",
+            width: drawerWidth,
+            boxSizing: "border-box",
+            backgroundImage: paperBackground,
+            ...getDrawerWidthTransitionMixin(expanded),
           },
-          ...getDrawerSharedSx(false),
         }}
       >
-        {getDrawerContent("tablet")}
-      </Drawer>
-      <Drawer
-        variant="permanent"
-        sx={{
-          display: { xs: "none", md: "block" },
-          ...getDrawerSharedSx(false),
-        }}
-      >
-        {getDrawerContent("desktop")}
+        <Toolbar />
+        <Box
+          component="nav"
+          aria-label="Menu principal"
+          sx={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            overflowY: "auto",
+            overflowX: "hidden",
+          }}
+        >
+          <Box sx={{ flex: 1 }}>{navigation}</Box>
+          <Divider />
+          {collapseButton}
+        </Box>
       </Drawer>
     </MainLayoutSidebarContext.Provider>
   );
