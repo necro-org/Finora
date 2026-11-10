@@ -89,7 +89,7 @@ export default function MainLayoutHeader({
         >
           <Stack direction="row" alignItems="center">
             <Box sx={{ mr: 1 }}>{getMenuIcon(menuOpen)}</Box>
-            <Link to="/" style={{ textDecoration: "none" }}>
+            <Link to="/painel" style={{ textDecoration: "none" }}>
               <Stack direction="row" alignItems="center">
                 {logo ? <LogoContainer>{logo}</LogoContainer> : null}
                 {title ? (
