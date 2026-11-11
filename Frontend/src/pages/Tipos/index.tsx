@@ -41,6 +41,7 @@ export default function Tipos() {
       }
     >
       <DataTable
+        tableKey="types"
         columns={[
           {
             field: "name",

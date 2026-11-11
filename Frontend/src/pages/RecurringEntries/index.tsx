@@ -41,6 +41,7 @@ export default function RecurringEntries() {
       }
     >
       <DataTable
+        tableKey="recurring-entries"
         columns={[
           {
             field: "description",

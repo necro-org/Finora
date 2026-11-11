@@ -7,8 +7,13 @@ import type {
 } from "@mui/x-data-grid";
 import { Box, type SxProps, type Theme } from "@mui/material";
 import FetchingLoading from "./FetchingLoading";
+import {
+  defaultPaginationModel,
+  useTablePaginationStore,
+} from "@stores/tablePaginationStore";
 
 interface DataTableProps<TData extends GridValidRowModel> {
+  tableKey: string;
   data?: GridRowsProp<TData>;
   columns: GridColDef<TData>[];
   isLoading: boolean;
@@ -18,6 +23,7 @@ interface DataTableProps<TData extends GridValidRowModel> {
 }
 
 export default function DataTable<TData extends GridValidRowModel>({
+  tableKey,
   data,
   columns,
   isLoading,
@@ -26,6 +32,10 @@ export default function DataTable<TData extends GridValidRowModel>({
   sx,
 }: DataTableProps<TData>) {
   const apiRef = useGridApiRef();
+  const paginationModel = useTablePaginationStore(
+    (state) => state.paginations[tableKey] ?? defaultPaginationModel,
+  );
+  const setPagination = useTablePaginationStore((state) => state.setPagination);
 
   return (
     <Box>
@@ -36,13 +46,8 @@ export default function DataTable<TData extends GridValidRowModel>({
         loading={isLoading}
         columns={columns}
         rows={data}
-        initialState={{
-          pagination: {
-            paginationModel: {
-              pageSize: 25,
-            },
-          },
-        }}
+        paginationModel={paginationModel}
+        onPaginationModelChange={(model) => setPagination(tableKey, model)}
         density="compact"
         disableColumnMenu
         disableVirtualization

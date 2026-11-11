@@ -41,6 +41,7 @@ export default function Contas() {
       }
     >
       <DataTable
+        tableKey="accounts"
         columns={[
           {
             field: "name",

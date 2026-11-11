@@ -129,6 +129,7 @@ export default function Lancamentos() {
         </Grid>
 
         <DataTable
+          tableKey="financial-entries"
           columns={[
             {
               field: "description",
