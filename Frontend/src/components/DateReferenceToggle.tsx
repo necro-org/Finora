@@ -11,7 +11,7 @@ import PaymentsRoundedIcon from "@mui/icons-material/PaymentsRounded";
 import {
   DateReferenceEnum,
   DateReferenceLabel,
-} from "@pages/Lancamentos/data/dtos/DateReferenceEnum";
+} from "@pages/Lancamentos/api/types/DateReferenceEnum";
 
 interface DateReferenceToggleProps {
   value: DateReferenceEnum;

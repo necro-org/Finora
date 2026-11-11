@@ -19,11 +19,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useGoTo } from "@hooks/useGoTo";
 import { startOfMonth } from "@utils";
-import { ClassificationEnum } from "@pages/Lancamentos/data/dtos/ClassificationEnum";
+import { ClassificationEnum } from "@pages/Lancamentos/api/types/ClassificationEnum";
 
-import useRecurringEntriesCreate from "./data/useRecurringEntriesCreate";
-import useRecurringEntriesUpdate from "./data/useRecurringEntriesUpdate";
-import useRecurringEntriesGet from "./data/useRecurringEntriesGet";
+import { useCreateRecurringEntry } from "./mutations/useCreateRecurringEntry";
+import { useUpdateRecurringEntry } from "./mutations/useUpdateRecurringEntry";
+import { useRecurringEntry } from "./queries/useRecurringEntry";
 
 const schema = z.object({
   id: z.guid().optional(),
@@ -57,11 +57,11 @@ export default function RecurringEntriesForm() {
     data,
     isLoading: _isLoading,
     isFetching,
-  } = useRecurringEntriesGet(recurringEntryId);
+  } = useRecurringEntry(recurringEntryId);
   const { mutateAsync: mutateAsyncCreate, isPending: isPendingCreate } =
-    useRecurringEntriesCreate();
+    useCreateRecurringEntry();
   const { mutateAsync: mutateAsyncUpdate, isPending: isPendingUpdate } =
-    useRecurringEntriesUpdate();
+    useUpdateRecurringEntry();
   const { goToRecurringEntries } = useGoTo();
 
   const isLoading = _isLoading || isFetching;
@@ -86,10 +86,12 @@ export default function RecurringEntriesForm() {
   async function onSubmit(d: DataType) {
     if (d.id) {
       await mutateAsyncUpdate({
-        data: { ...d, id: d.id, isActive: d.isActive ?? true },
+        ...d,
+        id: d.id,
+        isActive: d.isActive ?? true,
       });
     } else {
-      await mutateAsyncCreate({ data: d });
+      await mutateAsyncCreate(d);
     }
     goToRecurringEntries();
   }

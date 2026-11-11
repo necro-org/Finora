@@ -9,18 +9,18 @@ import PageContainer from "../../components/PageContainer";
 import DataTable from "../../components/DataTable";
 import BoxColor from "@components/BoxColor";
 
-import useFinancialAccountsList from "./data/useFinancialAccountsList";
-import useFinancialAccountsDelete from "./data/useFinancialAccountsDelete";
+import { useFinancialAccounts } from "./queries/useFinancialAccounts";
+import { useDeleteFinancialAccount } from "./mutations/useDeleteFinancialAccount";
 import { useGoTo } from "@hooks/useGoTo";
 import { confirmDelete } from "@libs/alert";
 
 export default function Contas() {
   const pageTitle = "Contas";
 
-  const { data, isLoading, isFetching } = useFinancialAccountsList({
+  const { data, isLoading, isFetching } = useFinancialAccounts({
     enabled: true,
   });
-  const { mutateAsync } = useFinancialAccountsDelete();
+  const { mutateAsync } = useDeleteFinancialAccount();
 
   const { goToContasForm } = useGoTo();
 

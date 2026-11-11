@@ -23,11 +23,11 @@ import ClassificationChip from "@components/ClassificationChip";
 import { useGoTo } from "@hooks/useGoTo";
 import { confirmDelete } from "@libs/alert";
 import { formatCurrency, formatDate, formatDateToShow } from "@utils";
-import { ClassificationEnum } from "@pages/Lancamentos/data/dtos/ClassificationEnum";
+import { ClassificationEnum } from "@pages/Lancamentos/api/types/ClassificationEnum";
 
-import useRecurringEntriesList from "./data/useRecurringEntriesList";
-import useRecurringEntriesDelete from "./data/useRecurringEntriesDelete";
-import type { ListRecurringEntriesResponse } from "./data/dtos/ListRecurringEntriesResponse";
+import { useRecurringEntries } from "./queries/useRecurringEntries";
+import { useDeleteRecurringEntry } from "./mutations/useDeleteRecurringEntry";
+import type { ListRecurringEntriesResponse } from "./api/types/ListRecurringEntriesResponse";
 
 function sumByClassification(
   entries: ListRecurringEntriesResponse[],
@@ -43,10 +43,10 @@ export default function RecurringEntries() {
 
   const [month, setMonth] = useState(() => dayjs().startOf("month"));
 
-  const { data, isLoading, isFetching } = useRecurringEntriesList({
-    date: formatDate(month) as string,
-  });
-  const { mutateAsync } = useRecurringEntriesDelete();
+  const { data, isLoading, isFetching } = useRecurringEntries(
+    formatDate(month) as string,
+  );
+  const { mutateAsync } = useDeleteRecurringEntry();
   const { goToRecurringEntriesForm } = useGoTo();
 
   const entriesOfMonth = (data || []).filter(

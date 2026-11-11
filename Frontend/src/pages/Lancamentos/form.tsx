@@ -17,16 +17,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useGoTo } from "@hooks/useGoTo";
 
-import useFinancialEntriesCreate from "./data/useFinancialEntriesCreate";
-import useFinancialEntriesUpdate from "./data/useFinancialEntriesUpdate";
-import useFinancialEntriesGet from "./data/useFinancialEntriesGet";
+import { useCreateFinancialEntry } from "./mutations/useCreateFinancialEntry";
+import { useUpdateFinancialEntry } from "./mutations/useUpdateFinancialEntry";
+import { useFinancialEntry } from "./queries/useFinancialEntry";
 import CurrencyTextField from "@components/CurrencyTextField";
 import { formatDate, formatToDayjs, todayDate } from "@utils";
 import FetchingLoading from "@components/FetchingLoading";
 import FormProvider from "@components/FormProvider";
 
-import { ClassificationEnum } from "./data/dtos/ClassificationEnum";
-import type { GetFinancialEntryResponse } from "./data/dtos/GetFinancialEntryResponse";
+import { ClassificationEnum } from "./api/types/ClassificationEnum";
+import type { GetFinancialEntryResponse } from "./api/types/GetFinancialEntryResponse";
 
 const schema = z.object({
   id: z.guid().optional(),
@@ -64,15 +64,11 @@ export default function LancamentosForm() {
 
   const pageTitle = isEdit ? "Editar" : "Adicionar";
 
-  const {
-    data,
-    isLoading: _isLoading,
-    isFetching,
-  } = useFinancialEntriesGet(typeId);
+  const { data, isLoading: _isLoading, isFetching } = useFinancialEntry(typeId);
   const { mutateAsync: mutateAsyncCreate, isPending: isPendingCreate } =
-    useFinancialEntriesCreate();
+    useCreateFinancialEntry();
   const { mutateAsync: mutateAsyncUpdate, isPending: isPendingUpdate } =
-    useFinancialEntriesUpdate();
+    useUpdateFinancialEntry();
   const { goToLancamentos } = useGoTo();
 
   const isLoading = _isLoading || isFetching;
@@ -93,16 +89,9 @@ export default function LancamentosForm() {
 
   async function onSubmit(d: DataType) {
     if (d.id) {
-      await mutateAsyncUpdate({
-        data: { ...d, id: d.id },
-      });
+      await mutateAsyncUpdate({ ...d, id: d.id });
     } else {
-      await mutateAsyncCreate({
-        data: d,
-        params: {
-          replicateUntilDate,
-        },
-      });
+      await mutateAsyncCreate({ data: d, replicateUntilDate });
     }
     goToLancamentos();
   }

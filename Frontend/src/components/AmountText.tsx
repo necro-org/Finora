@@ -1,6 +1,6 @@
 import { Typography } from "@mui/material";
 
-import { ClassificationEnum } from "@pages/Lancamentos/data/dtos/ClassificationEnum";
+import { ClassificationEnum } from "@pages/Lancamentos/api/types/ClassificationEnum";
 import { formatMoney } from "@utils";
 
 interface AmountTextProps {

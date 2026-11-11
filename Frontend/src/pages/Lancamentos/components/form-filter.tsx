@@ -8,7 +8,7 @@ import DatePicker from "@components/DatePicker";
 import TextField from "@components/TextField";
 
 import { formatDate, formatToDayjs } from "@utils";
-import { ClassificationEnum } from "../data/dtos/ClassificationEnum";
+import { ClassificationEnum } from "../api/types/ClassificationEnum";
 import {
   getDefaultFilters,
   useLancamentosFilterStore,

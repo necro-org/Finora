@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-import type { ClassificationEnum } from "@pages/Lancamentos/data/dtos/ClassificationEnum";
-import { DateReferenceEnum } from "@pages/Lancamentos/data/dtos/DateReferenceEnum";
+import type { ClassificationEnum } from "@pages/Lancamentos/api/types/ClassificationEnum";
+import { DateReferenceEnum } from "@pages/Lancamentos/api/types/DateReferenceEnum";
 import { endOfMonth, startOfMonth } from "@utils";
 
 export interface LancamentosFilterData {

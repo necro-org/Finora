@@ -1,4 +1,4 @@
-import useFinancialAccountsList from "@pages/Contas/data/useFinancialAccountsList";
+import { useFinancialAccounts } from "@pages/Contas/queries/useFinancialAccounts";
 import AutoComplete from "./AutoComplete";
 
 interface AutoCompleteAccountProps {
@@ -19,7 +19,7 @@ export default function AutoCompleteAccount({
     isLoading: _isLoading,
     isFetching,
     refetch,
-  } = useFinancialAccountsList({ enabled: false });
+  } = useFinancialAccounts({ enabled: false });
   const isLoading = _isLoading || isFetching;
 
   return (

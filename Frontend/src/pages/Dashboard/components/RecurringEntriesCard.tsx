@@ -10,9 +10,9 @@ import SectionCard from "@components/SectionCard";
 import AmountText from "@components/AmountText";
 import RecurringStatusChip from "@components/RecurringStatusChip";
 import { formatCurrency, formatDateToShow } from "@utils";
-import { ClassificationEnum } from "@pages/Lancamentos/data/dtos/ClassificationEnum";
+import { ClassificationEnum } from "@pages/Lancamentos/api/types/ClassificationEnum";
 
-import type { GetStatisticMonthRecurringEntryResponse } from "../data/dtos/GetStatisticMonthRecurringEntryResponse";
+import type { GetStatisticMonthRecurringEntryResponse } from "../api/types/GetStatisticMonthRecurringEntryResponse";
 
 interface RecurringEntriesCardProps {
   data: GetStatisticMonthRecurringEntryResponse[];

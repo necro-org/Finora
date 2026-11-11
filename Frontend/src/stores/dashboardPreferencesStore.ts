@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-import { DateReferenceEnum } from "@pages/Lancamentos/data/dtos/DateReferenceEnum";
+import { DateReferenceEnum } from "@pages/Lancamentos/api/types/DateReferenceEnum";
 
 interface DashboardPreferencesStore {
   dateReference: DateReferenceEnum;

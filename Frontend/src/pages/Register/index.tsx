@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useGoTo } from "@hooks/useGoTo";
 import useAuth from "@hooks/useAuth";
 
-import { useAuthenticationsRegister } from "./data/useAuthenticationsRegister";
+import { useRegister } from "./mutations/useRegister";
 import TextField from "@components/TextField";
 import TextFieldPassword from "@components/TextFieldPassword";
 import FormProvider from "@components/FormProvider";
@@ -27,7 +27,7 @@ const schema = z
 type DataType = z.infer<typeof schema>;
 
 export default function Register() {
-  const { mutateAsync, isPending } = useAuthenticationsRegister();
+  const { mutateAsync, isPending } = useRegister();
 
   const { setToken } = useAuth();
   const { goToPainel, goToLogin } = useGoTo();

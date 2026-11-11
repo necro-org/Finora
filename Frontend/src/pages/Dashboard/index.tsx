@@ -14,12 +14,12 @@ import SectionCard from "@components/SectionCard";
 import StatCard from "@components/StatCard";
 import useClassificationColor from "@hooks/useClassificationColor";
 import { formatCurrency, formatDate } from "@utils";
-import { ClassificationEnum } from "@pages/Lancamentos/data/dtos/ClassificationEnum";
-import { DateReferenceLabel } from "@pages/Lancamentos/data/dtos/DateReferenceEnum";
+import { ClassificationEnum } from "@pages/Lancamentos/api/types/ClassificationEnum";
+import { DateReferenceLabel } from "@pages/Lancamentos/api/types/DateReferenceEnum";
 import DateReferenceToggle from "@components/DateReferenceToggle";
 import { useDashboardPreferencesStore } from "@stores/dashboardPreferencesStore";
 
-import useDashboards from "./data/useDashboards";
+import { useDashboard } from "./queries/useDashboard";
 import ChartPie from "./components/ChartPie";
 import ChartBar from "./components/ChartBar";
 import RecurringEntriesCard from "./components/RecurringEntriesCard";
@@ -40,10 +40,7 @@ export default function Dashboard() {
     data,
     isLoading: _isLoading,
     isFetching,
-  } = useDashboards({
-    date: formatDate(selectedDate) as string,
-    dateReference,
-  });
+  } = useDashboard(formatDate(selectedDate) as string, dateReference);
 
   const isLoading = _isLoading || isFetching;
 

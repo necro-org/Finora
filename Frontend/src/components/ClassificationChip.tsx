@@ -6,7 +6,7 @@ import ArrowUpwardRoundedIcon from "@mui/icons-material/ArrowUpwardRounded";
 import {
   ClassificationEnum,
   ClassificationLabel,
-} from "@pages/Lancamentos/data/dtos/ClassificationEnum";
+} from "@pages/Lancamentos/api/types/ClassificationEnum";
 
 interface ClassificationChipProps {
   classification: ClassificationEnum;

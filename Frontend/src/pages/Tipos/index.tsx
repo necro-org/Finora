@@ -9,18 +9,18 @@ import PageContainer from "../../components/PageContainer";
 import DataTable from "../../components/DataTable";
 import BoxColor from "@components/BoxColor";
 
-import useFinancialTypesList from "./data/useFinancialTypesList";
-import useFinancialTypesDelete from "./data/useFinancialTypesDelete";
+import { useFinancialTypes } from "./queries/useFinancialTypes";
+import { useDeleteFinancialType } from "./mutations/useDeleteFinancialType";
 import { useGoTo } from "@hooks/useGoTo";
 import { confirmDelete } from "@libs/alert";
 
 export default function Tipos() {
   const pageTitle = "Tipos";
 
-  const { data, isLoading, isFetching } = useFinancialTypesList({
+  const { data, isLoading, isFetching } = useFinancialTypes({
     enabled: true,
   });
-  const { mutateAsync } = useFinancialTypesDelete();
+  const { mutateAsync } = useDeleteFinancialType();
 
   const { goToTiposForm } = useGoTo();
 

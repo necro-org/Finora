@@ -8,9 +8,9 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import useFinancialTypesCreate from "./data/useFinancialTypesCreate";
-import useFinancialTypesUpdate from "./data/useFinancialTypesUpdate";
-import useFinancialTypesGet from "./data/useFinancialTypesGet";
+import { useCreateFinancialType } from "./mutations/useCreateFinancialType";
+import { useUpdateFinancialType } from "./mutations/useUpdateFinancialType";
+import { useFinancialType } from "./queries/useFinancialType";
 import { useGoTo } from "@hooks/useGoTo";
 import FetchingLoading from "@components/FetchingLoading";
 import FormProvider from "@components/FormProvider";
@@ -33,15 +33,11 @@ export default function TiposForm() {
 
   const pageTitle = isEdit ? "Editar" : "Adicionar";
 
-  const {
-    data,
-    isLoading: _isLoading,
-    isFetching,
-  } = useFinancialTypesGet(typeId);
+  const { data, isLoading: _isLoading, isFetching } = useFinancialType(typeId);
   const { mutateAsync: mutateAsyncCreate, isPending: isPendingCreate } =
-    useFinancialTypesCreate();
+    useCreateFinancialType();
   const { mutateAsync: mutateAsyncUpdate, isPending: isPendingUpdate } =
-    useFinancialTypesUpdate();
+    useUpdateFinancialType();
   const { goToTipos } = useGoTo();
 
   const isLoading = _isLoading || isFetching;
@@ -57,13 +53,9 @@ export default function TiposForm() {
 
   async function onSubmit(d: DataType) {
     if (d.id) {
-      await mutateAsyncUpdate({
-        data: { ...d, id: d.id },
-      });
+      await mutateAsyncUpdate({ ...d, id: d.id });
     } else {
-      await mutateAsyncCreate({
-        data: d,
-      });
+      await mutateAsyncCreate(d);
     }
     goToTipos();
   }

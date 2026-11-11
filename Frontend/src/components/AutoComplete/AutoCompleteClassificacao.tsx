@@ -1,4 +1,4 @@
-import { ClassificationList } from "@pages/Lancamentos/data/dtos/ClassificationEnum";
+import { ClassificationList } from "@pages/Lancamentos/api/types/ClassificationEnum";
 import AutoComplete from "./AutoComplete";
 
 interface AutoCompleteClassificacaoProps {

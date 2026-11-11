@@ -4,7 +4,7 @@ import { Box, Stack, Typography } from "@mui/material";
 import SectionCard from "@components/SectionCard";
 import { formatCurrency } from "@utils";
 
-import type { GetStatisticMonthItemResponse } from "../data/dtos/GetStatisticMonthItemResponse";
+import type { GetStatisticMonthItemResponse } from "../api/types/GetStatisticMonthItemResponse";
 
 interface ChartPieProps {
   data: GetStatisticMonthItemResponse[];

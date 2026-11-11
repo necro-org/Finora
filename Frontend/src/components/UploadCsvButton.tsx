@@ -9,7 +9,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import useImportCsv from "@pages/Lancamentos/data/useImportCsv";
+import { useImportCsv } from "@pages/Lancamentos/mutations/useImportCsv";
 import { fireError } from "@libs/alert";
 import DatePicker from "./DatePicker";
 import AutoCompleteAccount from "./AutoComplete/AutoCompleteAccount";
@@ -57,12 +57,10 @@ export default function UploadCsvButton() {
     }
 
     await mutateAsync({
-      data: {
-        dateFinancialEntry,
-        timezoneOffsetMinutes: 1,
-        file: selectedFile,
-        accountId,
-      },
+      dateFinancialEntry,
+      timezoneOffsetMinutes: 1,
+      file: selectedFile,
+      accountId,
     });
 
     setSelectedFile(null);

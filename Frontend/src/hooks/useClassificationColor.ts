@@ -3,7 +3,7 @@ import { useTheme } from "@mui/material/styles";
 import {
   ClassificationEnum,
   ClassificationLabel,
-} from "@pages/Lancamentos/data/dtos/ClassificationEnum";
+} from "@pages/Lancamentos/api/types/ClassificationEnum";
 
 export default function useClassificationColor() {
   const theme = useTheme();

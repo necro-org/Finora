@@ -10,8 +10,8 @@ import { useGoTo } from "@hooks/useGoTo";
 import TextField from "@components/TextField";
 import TextFieldPassword from "@components/TextFieldPassword";
 import FormProvider from "@components/FormProvider";
-import { useAuthenticationsLogin } from "./data/useAuthenticationsLogin";
-import { useGuestLogin } from "./data/useGuestLogin";
+import { useLogin } from "./mutations/useLogin";
+import { useGuestLogin } from "./mutations/useGuestLogin";
 
 const schema = z.object({
   email: z.email({ message: "Informe o Email" }),
@@ -21,7 +21,7 @@ const schema = z.object({
 type DataType = z.infer<typeof schema>;
 
 export default function Login() {
-  const { mutateAsync, isPending } = useAuthenticationsLogin();
+  const { mutateAsync, isPending } = useLogin();
   const { mutateAsync: loginAsGuest, isPending: isGuestPending } =
     useGuestLogin();
 

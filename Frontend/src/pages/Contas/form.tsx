@@ -8,9 +8,9 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import useFinancialAccountsCreate from "./data/useFinancialAccountsCreate";
-import useFinancialAccountsUpdate from "./data/useFinancialAccountsUpdate";
-import useFinancialAccountsGet from "./data/useFinancialAccountsGet";
+import { useCreateFinancialAccount } from "./mutations/useCreateFinancialAccount";
+import { useUpdateFinancialAccount } from "./mutations/useUpdateFinancialAccount";
+import { useFinancialAccount } from "./queries/useFinancialAccount";
 import { useGoTo } from "@hooks/useGoTo";
 import FetchingLoading from "@components/FetchingLoading";
 import FormProvider from "@components/FormProvider";
@@ -37,11 +37,11 @@ export default function ContasForm() {
     data,
     isLoading: _isLoading,
     isFetching,
-  } = useFinancialAccountsGet(accountId);
+  } = useFinancialAccount(accountId);
   const { mutateAsync: mutateAsyncCreate, isPending: isPendingCreate } =
-    useFinancialAccountsCreate();
+    useCreateFinancialAccount();
   const { mutateAsync: mutateAsyncUpdate, isPending: isPendingUpdate } =
-    useFinancialAccountsUpdate();
+    useUpdateFinancialAccount();
   const { goToContas } = useGoTo();
 
   const isLoading = _isLoading || isFetching;
@@ -57,13 +57,9 @@ export default function ContasForm() {
 
   async function onSubmit(d: DataType) {
     if (d.id) {
-      await mutateAsyncUpdate({
-        data: { ...d, id: d.id },
-      });
+      await mutateAsyncUpdate({ ...d, id: d.id });
     } else {
-      await mutateAsyncCreate({
-        data: d,
-      });
+      await mutateAsyncCreate(d);
     }
     goToContas();
   }

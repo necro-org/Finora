@@ -17,9 +17,9 @@ import StatCard from "@components/StatCard";
 import AmountText from "@components/AmountText";
 import ClassificationChip from "@components/ClassificationChip";
 
-import useFinancialEntriesList from "./data/useFinancialEntriesList";
-import useFinancialEntriesDelete from "./data/useFinancialEntriesDelete";
-import { ClassificationEnum } from "./data/dtos/ClassificationEnum";
+import { useFinancialEntries } from "./queries/useFinancialEntries";
+import { useDeleteFinancialEntry } from "./mutations/useDeleteFinancialEntry";
+import { ClassificationEnum } from "./api/types/ClassificationEnum";
 import { useGoTo } from "@hooks/useGoTo";
 import { confirmDelete } from "@libs/alert";
 import { formatCurrency, formatDateToShow } from "@utils";
@@ -29,7 +29,7 @@ import UploadCsvButton from "@components/UploadCsvButton";
 import { useLancamentosFilterStore } from "@stores/lancamentosFilterStore";
 import FormFilter from "./components/form-filter";
 import DateReferenceToggle from "@components/DateReferenceToggle";
-import { DateReferenceEnum } from "./data/dtos/DateReferenceEnum";
+import { DateReferenceEnum } from "./api/types/DateReferenceEnum";
 
 export default function Lancamentos() {
   const pageTitle = "Lançamentos";
@@ -38,14 +38,12 @@ export default function Lancamentos() {
 
   const { isNotConfirmed, ...restOfFilters } = filters;
 
-  const { data, isLoading, isFetching } = useFinancialEntriesList({
-    data: {
-      ...restOfFilters,
-      isConfirmed: isNotConfirmed === null ? null : !isNotConfirmed,
-    },
+  const { data, isLoading, isFetching } = useFinancialEntries({
+    ...restOfFilters,
+    isConfirmed: isNotConfirmed === null ? null : !isNotConfirmed,
   });
 
-  const { mutateAsync } = useFinancialEntriesDelete();
+  const { mutateAsync } = useDeleteFinancialEntry();
   const { goToLancamentosForm } = useGoTo();
 
   const entries = data || [];

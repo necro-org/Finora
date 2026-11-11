@@ -1,4 +1,4 @@
-import useFinancialTypesList from "@pages/Tipos/data/useFinancialTypesList";
+import { useFinancialTypes } from "@pages/Tipos/queries/useFinancialTypes";
 import AutoComplete from "./AutoComplete";
 
 interface AutoCompleteTipoProps {
@@ -19,7 +19,7 @@ export default function AutoCompleteTipo({
     isLoading: _isLoading,
     isFetching,
     refetch,
-  } = useFinancialTypesList({ enabled: false });
+  } = useFinancialTypes({ enabled: false });
   const isLoading = _isLoading || isFetching;
 
   return (

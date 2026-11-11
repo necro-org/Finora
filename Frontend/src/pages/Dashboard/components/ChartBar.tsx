@@ -4,7 +4,7 @@ import SectionCard from "@components/SectionCard";
 import useClassificationColor from "@hooks/useClassificationColor";
 import { formatCurrency } from "@utils";
 
-import type { ChartDataOfYearDto } from "../data/dtos/ChartDataOfYearDto";
+import type { ChartDataOfYearDto } from "../api/types/ChartDataOfYearDto";
 
 interface ChartBarProps {
   data: ChartDataOfYearDto[];
