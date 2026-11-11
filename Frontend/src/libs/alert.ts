@@ -3,40 +3,81 @@ import Swal, { type SweetAlertIcon } from "sweetalert2";
 import { AxiosError, HttpStatusCode } from "axios";
 
 interface ResponseData {
-  status: HttpStatusCode;
-  detail: string | string[];
+  status?: HttpStatusCode;
   title?: string;
+  detail?: string | string[];
+  errors?: Record<string, string[]>;
 }
 
-function extractError(err: unknown) {
-  let title = "Oops...";
-  let text = "Algo deu errado!";
-  let icon: SweetAlertIcon = "error";
+interface ExtractedError {
+  title: string;
+  messages: string[];
+  icon: SweetAlertIcon;
+}
 
+const defaultTitle = "Oops...";
+const defaultMessage = "Algo deu errado!";
+
+function toMessages(data: ResponseData) {
+  const details = Array.isArray(data.detail)
+    ? data.detail
+    : data.detail
+      ? [data.detail]
+      : [];
+
+  const validationErrors = Object.values(data.errors ?? {}).flat();
+
+  return [...details, ...validationErrors].filter(Boolean);
+}
+
+function extractError(err: unknown): ExtractedError {
   if (err instanceof AxiosError) {
-    const data: ResponseData | undefined = err?.response?.data;
-    if (data && data.detail) {
-      title = data.status + " " + (data.title || title);
-      text =
-        typeof data.detail === "string" ? data.detail : data.detail.join(",");
-      icon = data.status === HttpStatusCode.BadRequest ? "warning" : "error";
-    }
+    const data: ResponseData | undefined = err.response?.data;
+    const status = data?.status ?? err.response?.status;
+    const messages = data ? toMessages(data) : [];
+
+    return {
+      title: data?.title || defaultTitle,
+      messages: messages.length > 0 ? messages : [defaultMessage],
+      icon: status === HttpStatusCode.BadRequest ? "warning" : "error",
+    };
   }
 
-  if (err instanceof Error) {
-    text = err.message;
+  if (err instanceof Error && err.message) {
+    return { title: defaultTitle, messages: [err.message], icon: "error" };
   }
 
-  return { title, text, icon };
+  return { title: defaultTitle, messages: [defaultMessage], icon: "error" };
+}
+
+function escapeHtml(value: string) {
+  const element = document.createElement("div");
+  element.textContent = value;
+  return element.innerHTML;
+}
+
+function buildMessagesHtml(messages: string[]) {
+  const style =
+    "margin:0;font-size:1.1rem;font-weight:600;color:inherit;line-height:1.5";
+
+  if (messages.length === 1) {
+    return `<p style="${style}">${escapeHtml(messages[0])}</p>`;
+  }
+
+  const items = messages
+    .map((message) => `<li>${escapeHtml(message)}</li>`)
+    .join("");
+
+  return `<ul style="${style};text-align:left;padding-left:1.25rem">${items}</ul>`;
 }
 
 export function fireError(err: unknown) {
-  const { icon, title, text } = extractError(err);
+  const { icon, title, messages } = extractError(err);
 
   Swal.fire({
     icon,
     title,
-    text,
+    html: buildMessagesHtml(messages),
     confirmButtonText: "Beleza!",
     showCloseButton: true,
   });
