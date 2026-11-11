@@ -11,24 +11,7 @@ import MainLayoutHeader from "./MainLayoutHeader";
 import MainLayoutSidebar from "./MainLayoutSidebar";
 
 import useAuth from "@hooks/useAuth";
-
-const SIDEBAR_EXPANDED_STORAGE_KEY = "finora:sidebar-expanded";
-
-function readStoredSidebarExpanded() {
-  try {
-    return localStorage.getItem(SIDEBAR_EXPANDED_STORAGE_KEY) !== "false";
-  } catch {
-    return true;
-  }
-}
-
-function storeSidebarExpanded(expanded: boolean) {
-  try {
-    localStorage.setItem(SIDEBAR_EXPANDED_STORAGE_KEY, String(expanded));
-  } catch {
-    return;
-  }
-}
+import { useLayoutPreferencesStore } from "@stores/layoutPreferencesStore";
 
 export default function MainLayout() {
   const theme = useTheme();
@@ -36,21 +19,19 @@ export default function MainLayout() {
 
   const isOverSmViewport = useMediaQuery(theme.breakpoints.up("sm"));
 
-  const [isDesktopExpanded, setIsDesktopExpanded] = React.useState(
-    readStoredSidebarExpanded,
-  );
+  const { isSidebarExpanded: isDesktopExpanded, setIsSidebarExpanded } =
+    useLayoutPreferencesStore();
   const [isMobileOpen, setIsMobileOpen] = React.useState(false);
 
   const setExpanded = React.useCallback(
     (expanded: boolean) => {
       if (isOverSmViewport) {
-        setIsDesktopExpanded(expanded);
-        storeSidebarExpanded(expanded);
+        setIsSidebarExpanded(expanded);
       } else {
         setIsMobileOpen(expanded);
       }
     },
-    [isOverSmViewport],
+    [isOverSmViewport, setIsSidebarExpanded],
   );
 
   const layoutRef = React.useRef<HTMLDivElement>(null);
