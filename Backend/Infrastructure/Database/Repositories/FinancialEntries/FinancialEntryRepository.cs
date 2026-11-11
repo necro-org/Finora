@@ -20,10 +20,13 @@ public class FinancialEntryRepository : IFinancialEntryRepository
     {
         var search = filter.SearchText == null ? null : filter.SearchText.Trim();
 
-        return await _context.FinancialEntries
-            .Where(x => x.UserId == userId)
-            .Where(x => filter.InitialDate == null || x.Date >= filter.InitialDate)
-            .Where(x => filter.FinalDate == null || x.Date <= filter.FinalDate)
+        var userEntries = _context.FinancialEntries.Where(x => x.UserId == userId);
+
+        return await WhereReferenceDateBetween(
+                userEntries,
+                filter.DateReference ?? DateReferenceEnum.EntryDate,
+                filter.InitialDate,
+                filter.FinalDate)
             .Where(x => filter.InitialAmount == null || x.Amount >= filter.InitialAmount)
             .Where(x => filter.FinalAmount == null || x.Amount <= filter.FinalAmount)
             .Where(x => search == null || x.Description == null || EF.Functions.ILike(x.Description, $"%{search}%"))
@@ -37,25 +40,36 @@ public class FinancialEntryRepository : IFinancialEntryRepository
             .ToListAsync();
     }
 
-    public async Task<List<FinancialEntry>> GetEntriesOfMonth(DateTime date, Guid userId)
+    public async Task<List<FinancialEntry>> GetEntriesOfMonth(DateTime date, Guid userId, DateReferenceEnum dateReference)
     {
-        return await _context.FinancialEntries
-            .Where(x => x.UserId == userId)
-            .Where(x => x.Date.Month == date.Month)
-            .Where(x => x.Date.Year == date.Year)
+        var firstDayOfMonth = new DateOnly(date.Year, date.Month, 1);
+        var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
+
+        var userEntries = _context.FinancialEntries.Where(x => x.UserId == userId);
+
+        return await WhereReferenceDateBetween(userEntries, dateReference, firstDayOfMonth, lastDayOfMonth)
             .ToListAsync();
     }
 
-    public async Task<List<ChartDataOfYearDto>> GetChartDataOfYear(DateTime date, Guid userId)
+    public async Task<List<ChartDataOfYearDto>> GetChartDataOfYear(DateTime date, Guid userId, DateReferenceEnum dateReference)
     {
-        var year = date.Year;
+        var firstDayOfYear = new DateOnly(date.Year, 1, 1);
+        var lastDayOfYear = new DateOnly(date.Year, 12, 31);
 
-        var result = await _context.FinancialEntries
-            .Where(x => x.UserId == userId)
-            .Where(x => x.Date.Year == year)
+        var entriesOfYear = WhereReferenceDateBetween(
+            _context.FinancialEntries.Where(x => x.UserId == userId),
+            dateReference,
+            firstDayOfYear,
+            lastDayOfYear);
+
+        var entriesWithReferenceDate = dateReference == DateReferenceEnum.PaymentDate
+            ? entriesOfYear.Select(x => new { ReferenceDate = x.DatePayment ?? x.Date, x.Classification, x.Amount })
+            : entriesOfYear.Select(x => new { ReferenceDate = x.Date, x.Classification, x.Amount });
+
+        var result = await entriesWithReferenceDate
             .GroupBy(x => new
             {
-                Month = x.Date.Month,
+                Month = x.ReferenceDate.Month,
                 Classification = x.Classification,
             })
             .Select(g => new
@@ -94,5 +108,23 @@ public class FinancialEntryRepository : IFinancialEntryRepository
     public async Task AddRange(List<FinancialEntry> financialEntries)
     {
         await _context.FinancialEntries.AddRangeAsync(financialEntries);
+    }
+
+    private static IQueryable<FinancialEntry> WhereReferenceDateBetween(
+        IQueryable<FinancialEntry> query,
+        DateReferenceEnum dateReference,
+        DateOnly? initialDate,
+        DateOnly? finalDate)
+    {
+        if (dateReference == DateReferenceEnum.PaymentDate)
+        {
+            return query
+                .Where(x => initialDate == null || (x.DatePayment ?? x.Date) >= initialDate)
+                .Where(x => finalDate == null || (x.DatePayment ?? x.Date) <= finalDate);
+        }
+
+        return query
+            .Where(x => initialDate == null || x.Date >= initialDate)
+            .Where(x => finalDate == null || x.Date <= finalDate);
     }
 }

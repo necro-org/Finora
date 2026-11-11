@@ -1,3 +1,5 @@
-﻿namespace Application.Dashboards.GetStatisticsMonth;
+﻿using Domain.FinancialEntries;
 
-public record GetStatisticMonthRequest(DateTime Date);
+namespace Application.Dashboards.GetStatisticsMonth;
+
+public record GetStatisticMonthRequest(DateTime Date, DateReferenceEnum DateReference = DateReferenceEnum.EntryDate);

@@ -26,7 +26,7 @@ export default function FormFilter() {
   }
 
   function handleSearch() {
-    setFilters(draft);
+    setFilters({ ...draft, dateReference: filters.dateReference });
   }
 
   function handleClear() {

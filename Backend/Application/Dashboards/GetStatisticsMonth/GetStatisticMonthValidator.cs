@@ -7,5 +7,6 @@ public class GetStatisticMonthValidator: AbstractValidator<GetStatisticMonthRequ
     public GetStatisticMonthValidator()
     {
         RuleFor(x => x.Date).NotEmpty();
+        RuleFor(x => x.DateReference).IsInEnum();
     }
 }

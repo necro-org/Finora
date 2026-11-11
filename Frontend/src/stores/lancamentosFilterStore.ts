@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 import type { ClassificationEnum } from "@pages/Lancamentos/data/dtos/ClassificationEnum";
+import { DateReferenceEnum } from "@pages/Lancamentos/data/dtos/DateReferenceEnum";
 import { endOfMonth, startOfMonth } from "@utils";
 
 export interface LancamentosFilterData {
@@ -14,6 +15,7 @@ export interface LancamentosFilterData {
   accountId: string | null;
   classification: ClassificationEnum | null;
   isNotConfirmed: boolean | null;
+  dateReference: DateReferenceEnum;
 }
 
 export function getDefaultFilters(): LancamentosFilterData {
@@ -27,6 +29,7 @@ export function getDefaultFilters(): LancamentosFilterData {
     accountId: null,
     classification: null,
     isNotConfirmed: null,
+    dateReference: DateReferenceEnum.EntryDate,
   };
 }
 

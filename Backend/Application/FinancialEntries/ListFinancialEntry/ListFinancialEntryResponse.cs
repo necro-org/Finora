@@ -5,6 +5,7 @@ namespace Application.FinancialEntries.ListFinancialEntry;
 public record ListFinancialEntryResponse(
     Guid Id,
     DateOnly Date,
+    DateOnly? DatePayment,
     decimal Amount,
     Guid? TypeId,
     string? TypeName,

@@ -15,6 +15,9 @@ import StatCard from "@components/StatCard";
 import useClassificationColor from "@hooks/useClassificationColor";
 import { formatCurrency, formatDate } from "@utils";
 import { ClassificationEnum } from "@pages/Lancamentos/data/dtos/ClassificationEnum";
+import { DateReferenceLabel } from "@pages/Lancamentos/data/dtos/DateReferenceEnum";
+import DateReferenceToggle from "@components/DateReferenceToggle";
+import { useDashboardPreferencesStore } from "@stores/dashboardPreferencesStore";
 
 import useDashboards from "./data/useDashboards";
 import ChartPie from "./components/ChartPie";
@@ -30,12 +33,15 @@ export default function Dashboard() {
 
   const selectedDate = dateYearMonth ?? todayLocaleDate;
 
+  const { dateReference, setDateReference } = useDashboardPreferencesStore();
+
   const {
     data,
     isLoading: _isLoading,
     isFetching,
   } = useDashboards({
     date: formatDate(selectedDate) as string,
+    dateReference,
   });
 
   const isLoading = _isLoading || isFetching;
@@ -60,9 +66,18 @@ export default function Dashboard() {
     periodLabel.charAt(0).toUpperCase() + periodLabel.slice(1);
 
   return (
-    <PageContainer title={pageTitle}>
+    <PageContainer
+      title={pageTitle}
+      actions={
+        <DateReferenceToggle
+          value={dateReference}
+          onChange={setDateReference}
+        />
+      }
+    >
       <Typography color="text.secondary" sx={{ mt: -1.5, mb: 2 }}>
-        Resumo de {periodTitle}
+        Resumo de {periodTitle} por data de{" "}
+        {DateReferenceLabel[dateReference].toLowerCase()}
       </Typography>
 
       <FetchingLoading loading={isLoading} />

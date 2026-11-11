@@ -28,11 +28,13 @@ import BoxColor from "@components/BoxColor";
 import UploadCsvButton from "@components/UploadCsvButton";
 import { useLancamentosFilterStore } from "@stores/lancamentosFilterStore";
 import FormFilter from "./components/form-filter";
+import DateReferenceToggle from "@components/DateReferenceToggle";
+import { DateReferenceEnum } from "./data/dtos/DateReferenceEnum";
 
 export default function Lancamentos() {
   const pageTitle = "Lançamentos";
 
-  const { filters } = useLancamentosFilterStore();
+  const { filters, setFilters } = useLancamentosFilterStore();
 
   const { isNotConfirmed, ...restOfFilters } = filters;
 
@@ -75,7 +77,19 @@ export default function Lancamentos() {
       }
     >
       <Stack gap={2}>
-        <SectionCard title="Filtros" subtitle="Refine os lançamentos exibidos">
+        <SectionCard
+          title="Filtros"
+          subtitle="Refine os lançamentos exibidos"
+          action={
+            <DateReferenceToggle
+              label="Filtrar datas por"
+              value={filters.dateReference ?? DateReferenceEnum.EntryDate}
+              onChange={(dateReference) =>
+                setFilters({ ...filters, dateReference })
+              }
+            />
+          }
+        >
           <FormFilter />
         </SectionCard>
 
@@ -123,8 +137,16 @@ export default function Lancamentos() {
             },
             {
               field: "date",
-              headerName: "Data",
+              headerName: "Data de lançamento",
+              minWidth: 140,
               valueFormatter: formatDateToShow,
+            },
+            {
+              field: "datePayment",
+              headerName: "Data de pagamento",
+              minWidth: 140,
+              valueFormatter: (value: string | null) =>
+                formatDateToShow(value) || "—",
             },
             {
               field: "amount",

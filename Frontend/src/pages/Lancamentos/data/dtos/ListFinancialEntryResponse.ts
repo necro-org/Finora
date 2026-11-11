@@ -3,6 +3,7 @@ import type { ClassificationEnum } from "./ClassificationEnum";
 export interface ListFinancialEntryResponse {
   id: string;
   date: string;
+  datePayment: string | null;
   amount: number;
   typeId: string | null;
   typeName: string | null;

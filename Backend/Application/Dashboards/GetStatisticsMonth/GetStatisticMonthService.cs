@@ -34,8 +34,8 @@ public class GetStatisticMonthService : IServiceHandler<GetStatisticMonthRequest
         var financialTypesData = await _financialTypeRepository.GetAll(userId);
         var classificationsData = (ClassificationEnum[])Enum.GetValues(typeof(ClassificationEnum));
         var financialAccountsData = await _financialAccountRepository.GetAll(userId);
-        var financialEntriesMonth = await _financialEntryRepository.GetEntriesOfMonth(request.Date, userId);
-        var classificationsOfYear = await _financialEntryRepository.GetChartDataOfYear(request.Date, userId);
+        var financialEntriesMonth = await _financialEntryRepository.GetEntriesOfMonth(request.Date, userId, request.DateReference);
+        var classificationsOfYear = await _financialEntryRepository.GetChartDataOfYear(request.Date, userId, request.DateReference);
 
         var financialTypesResponse = new List<GetStatisticMonthItemResponse>();
         var classificationsResponse = new List<GetStatisticMonthItemResponse>();

@@ -27,7 +27,7 @@ export default function SectionCard({
             alignItems="center"
             justifyContent="space-between"
             gap={2}
-            sx={{ px: 2.5, py: 1.75 }}
+            sx={{ px: 2.5, py: 1.75, flexWrap: "wrap", rowGap: 1 }}
           >
             <Stack sx={{ minWidth: 0 }}>
               {title ? (

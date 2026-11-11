@@ -11,4 +11,5 @@ public record FinancialEntryFilterDto(
     Guid? TypeId,
     Guid? AccountId,
     ClassificationEnum? Classification,
-    Boolean? IsConfirmed);
+    Boolean? IsConfirmed,
+    DateReferenceEnum? DateReference = null);

@@ -27,6 +27,7 @@ public class ListFinancialEntryService : IServiceHandler<FinancialEntryFilterDto
             .Select(x => new ListFinancialEntryResponse(
                 x.Id,
                 x.Date,
+                x.DatePayment,
                 x.Amount,
                 x.TypeId,
                 x.Type?.Name,
