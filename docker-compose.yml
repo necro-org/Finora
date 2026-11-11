@@ -1,0 +1,76 @@
+name: finora
+
+services:
+  finora-db:
+    image: postgres:18.1
+    container_name: finora-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: finora
+      PGDATA: /var/lib/postgresql/data
+    volumes:
+      - finora-db-data:/var/lib/postgresql/data
+
+  finora-api:
+    container_name: finora-api
+    build:
+      context: ./Backend
+      dockerfile: Api/Dockerfile.dev
+    ports:
+      - "5000:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: 8080
+      DOTNET_WATCH_RESTART_ON_RUDE_EDIT: "true"
+    depends_on:
+      - finora-db
+    develop:
+      watch:
+        - action: sync
+          path: ./Backend
+          target: /src
+          ignore:
+            - "**/bin/"
+            - "**/obj/"
+            - "**/*.csproj"
+        - action: rebuild
+          path: ./Backend/Api/Api.csproj
+        - action: rebuild
+          path: ./Backend/Application/Application.csproj
+        - action: rebuild
+          path: ./Backend/Contracts/Contracts.csproj
+        - action: rebuild
+          path: ./Backend/Domain/Domain.csproj
+        - action: rebuild
+          path: ./Backend/Infrastructure/Infrastructure.csproj
+
+  finora-web:
+    container_name: finora-web
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5173:5173"
+    depends_on:
+      - finora-api
+    develop:
+      watch:
+        - action: sync
+          path: ./Frontend
+          target: /app
+          ignore:
+            - node_modules/
+            - dist/
+            - package.json
+            - package-lock.json
+        - action: rebuild
+          path: ./Frontend/package.json
+        - action: rebuild
+          path: ./Frontend/package-lock.json
+
+volumes:
+  finora-db-data:
+    name: finora-db-data

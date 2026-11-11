@@ -2,9 +2,6 @@
   <Project Path="Api/Api.csproj" Id="3bc4ab41-11ef-4438-9521-c8586e2a7174" />
   <Project Path="Application/Application.csproj" Id="bf7ec887-4762-4b13-9243-7dcca4751510" />
   <Project Path="Contracts/Contracts.csproj" Id="26b850c3-c6b7-4503-9048-f166cc008285" />
-  <Project Path="docker-compose.dcproj">
-    <Build />
-  </Project>
   <Project Path="Domain/Domain.csproj" Id="46911a9f-7334-4a6f-8edb-457c493eb3e5" />
   <Project Path="Infrastructure/Infrastructure.csproj" Id="fe5ef660-9333-4c17-a53d-628b3de08eb4" />
 </Solution>
