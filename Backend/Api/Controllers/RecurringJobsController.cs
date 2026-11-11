@@ -14,9 +14,9 @@ public class RecurringJobsController : ApiController
     [HttpPost("generate-occurrences")]
     [ApiKeyAuthorization]
     public async Task<IActionResult> GenerateOccurrences(
-        [FromServices] IServiceHandler<GenerateRecurringEntryOccurrencesRequest, Success> service)
+        [FromServices] IServiceHandler<GenerateRecurringEntryOccurrencesRequest, GenerateRecurringEntryOccurrencesResponse> service)
     {
-        await service.Handle(new GenerateRecurringEntryOccurrencesRequest());
-        return Ok();
+        var response = await service.Handle(new GenerateRecurringEntryOccurrencesRequest());
+        return Ok(response);
     }
 }

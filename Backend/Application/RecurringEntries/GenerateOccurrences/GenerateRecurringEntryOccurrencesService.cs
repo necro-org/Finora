@@ -7,7 +7,7 @@ using Domain.RecurringEntries;
 
 namespace Application.RecurringEntries.GenerateOccurrences;
 
-public class GenerateRecurringEntryOccurrencesService : IServiceHandler<GenerateRecurringEntryOccurrencesRequest, Success>
+public class GenerateRecurringEntryOccurrencesService : IServiceHandler<GenerateRecurringEntryOccurrencesRequest, GenerateRecurringEntryOccurrencesResponse>
 {
     private readonly IRecurringEntryRepository _recurringEntryRepository;
     private readonly IRecurringEntryOccurrenceRepository _recurringEntryOccurrenceRepository;
@@ -26,23 +26,33 @@ public class GenerateRecurringEntryOccurrencesService : IServiceHandler<Generate
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Success> Handle(GenerateRecurringEntryOccurrencesRequest request)
+    public async Task<GenerateRecurringEntryOccurrencesResponse> Handle(GenerateRecurringEntryOccurrencesRequest request)
     {
         var processingDate = DateOnly.FromDateTime(DateTime.Today);
         var activeEntries = await _recurringEntryRepository.GetActiveForProcessing(processingDate);
+
+        var generated = new List<GeneratedRecurringEntryOccurrenceResponse>();
+        var alreadyProcessedCount = 0;
+        var notDueYetCount = 0;
 
         foreach (var entry in activeEntries)
         {
             var occurrenceDate = entry.GetOccurrenceDate(processingDate.Year, processingDate.Month);
 
             if (occurrenceDate > processingDate)
+            {
+                notDueYetCount++;
                 continue;
+            }
 
             var alreadyProcessed = await _recurringEntryOccurrenceRepository
                 .ExistsForMonth(entry.Id, processingDate.Year, processingDate.Month);
 
             if (alreadyProcessed)
+            {
+                alreadyProcessedCount++;
                 continue;
+            }
 
             var financialEntry = new FinancialEntry(
                 date: occurrenceDate,
@@ -59,10 +69,25 @@ public class GenerateRecurringEntryOccurrencesService : IServiceHandler<Generate
             var occurrence = new RecurringEntryOccurrence(entry.Id, financialEntry.Id, occurrenceDate);
 
             await _recurringEntryOccurrenceRepository.Add(occurrence);
+
+            generated.Add(new GeneratedRecurringEntryOccurrenceResponse(
+                entry.Id,
+                financialEntry.Id,
+                entry.UserId,
+                entry.Description,
+                entry.Amount,
+                entry.Classification,
+                occurrenceDate));
         }
 
         await _unitOfWork.SaveChanges();
 
-        return Success.Value;
+        return new GenerateRecurringEntryOccurrencesResponse(
+            processingDate,
+            activeEntries.Count,
+            generated.Count,
+            alreadyProcessedCount,
+            notDueYetCount,
+            generated);
     }
 }
