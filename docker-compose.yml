@@ -16,6 +16,7 @@ services:
 
   finora-api:
     container_name: finora-api
+    pull_policy: build
     build:
       context: ./Backend
       dockerfile: Api/Dockerfile.dev
@@ -49,6 +50,7 @@ services:
 
   finora-web:
     container_name: finora-web
+    pull_policy: build
     build:
       context: ./Frontend
       dockerfile: Dockerfile.dev
