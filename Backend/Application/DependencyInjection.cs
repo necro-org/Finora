@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Application.Base;
+using Application.Guests;
 using Application.Importations;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,6 +20,8 @@ public static class DependencyInjection
             .WithScopedLifetime());
 
         services.Decorate(typeof(IServiceHandler<,>), typeof(ServiceHandlerDecorator<,>));
+
+        services.AddScoped<GuestDataSeeder>();
 
         services.Scan(scan => scan
             .FromAssemblies(typeof(ICsvImporter).Assembly)

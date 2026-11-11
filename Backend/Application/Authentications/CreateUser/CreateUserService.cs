@@ -51,9 +51,9 @@ public class CreateUserService : IServiceHandler<CreateUserRequest, Authenticati
 
         await _userRepository.Add(user);
 
-        foreach (var name in DefaultFinancialTypes.Names)
+        foreach (var (name, color) in DefaultFinancialTypes.Types)
         {
-            await _financialTypeRepository.Add(new FinancialType(name, null, user.Id));
+            await _financialTypeRepository.Add(new FinancialType(name, color, user.Id));
         }
 
         await _unitOfWork.SaveChanges();

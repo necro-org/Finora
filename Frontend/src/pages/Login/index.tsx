@@ -1,4 +1,4 @@
-import { Link, Box, Typography, Stack, Button } from "@mui/material";
+import { Link, Box, Typography, Stack, Button, Divider } from "@mui/material";
 import useAuth from "@hooks/useAuth";
 import AuthCard from "@components/AuthCard";
 
@@ -11,6 +11,7 @@ import TextField from "@components/TextField";
 import TextFieldPassword from "@components/TextFieldPassword";
 import FormProvider from "@components/FormProvider";
 import { useAuthenticationsLogin } from "./data/useAuthenticationsLogin";
+import { useGuestLogin } from "./data/useGuestLogin";
 
 const schema = z.object({
   email: z.email({ message: "Informe o Email" }),
@@ -21,6 +22,8 @@ type DataType = z.infer<typeof schema>;
 
 export default function Login() {
   const { mutateAsync, isPending } = useAuthenticationsLogin();
+  const { mutateAsync: loginAsGuest, isPending: isGuestPending } =
+    useGuestLogin();
 
   const { setToken } = useAuth();
   const { goToPainel, goToRegistrar } = useGoTo();
@@ -31,6 +34,12 @@ export default function Login() {
 
   async function onSubmit(d: DataType) {
     const response = await mutateAsync(d);
+    setToken(response.token);
+    goToPainel();
+  }
+
+  async function onGuestLogin() {
+    const response = await loginAsGuest();
     setToken(response.token);
     goToPainel();
   }
@@ -75,6 +84,23 @@ export default function Login() {
             Entre
           </Button>
         </FormProvider>
+
+        <Divider sx={{ mb: 2 }}>
+          <Typography variant="caption" color="text.secondary">
+            ou
+          </Typography>
+        </Divider>
+
+        <Button
+          loading={isGuestPending}
+          disabled={isPending}
+          variant="outlined"
+          fullWidth
+          sx={{ mb: 2 }}
+          onClick={onGuestLogin}
+        >
+          Testar sem conta
+        </Button>
 
         <Typography variant="body2" color="text.secondary" textAlign="center">
           Não tem uma conta?{" "}
