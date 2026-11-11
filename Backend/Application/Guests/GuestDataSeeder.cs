@@ -1,7 +1,6 @@
 using Application.FinancialTypes;
 using Application.Guests.ResetGuest;
 using Contracts.Authentications;
-using Contracts.Repositories;
 using Contracts.Repositories.FinancialAccounts;
 using Contracts.Repositories.FinancialEntries;
 using Contracts.Repositories.FinancialTypes;
@@ -66,7 +65,6 @@ public class GuestDataSeeder
     private readonly IRecurringEntryOccurrenceRepository _recurringEntryOccurrenceRepository;
     private readonly IFinancialEntryRepository _financialEntryRepository;
     private readonly IPasswordHasher _passwordHasher;
-    private readonly IUnitOfWork _unitOfWork;
 
     public GuestDataSeeder(
         IUserRepository userRepository,
@@ -75,8 +73,7 @@ public class GuestDataSeeder
         IRecurringEntryRepository recurringEntryRepository,
         IRecurringEntryOccurrenceRepository recurringEntryOccurrenceRepository,
         IFinancialEntryRepository financialEntryRepository,
-        IPasswordHasher passwordHasher,
-        IUnitOfWork unitOfWork)
+        IPasswordHasher passwordHasher)
     {
         _userRepository = userRepository;
         _financialTypeRepository = financialTypeRepository;
@@ -85,7 +82,6 @@ public class GuestDataSeeder
         _recurringEntryOccurrenceRepository = recurringEntryOccurrenceRepository;
         _financialEntryRepository = financialEntryRepository;
         _passwordHasher = passwordHasher;
-        _unitOfWork = unitOfWork;
     }
 
     public async Task<(User Guest, ResetGuestResponse Summary)> Reset()
@@ -218,8 +214,6 @@ public class GuestDataSeeder
         }
 
         await _financialEntryRepository.AddRange(financialEntries);
-
-        await _unitOfWork.SaveChanges();
 
         var summary = new ResetGuestResponse(
             today,

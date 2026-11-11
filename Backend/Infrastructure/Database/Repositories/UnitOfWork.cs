@@ -1,13 +1,11 @@
 ﻿using Contracts.Repositories;
-using Domain.Base;
 using Infrastructure.Database.Context;
-using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Database.Repositories;
 
 public class UnitOfWork : IUnitOfWork
 {
-    private ApplicationDbContext _context;
+    private readonly ApplicationDbContext _context;
 
     public UnitOfWork(ApplicationDbContext context)
     {
@@ -16,22 +14,9 @@ public class UnitOfWork : IUnitOfWork
 
     public async Task SaveChanges()
     {
-        var entries = _context.ChangeTracker.Entries();
-
-        foreach (var entry in entries)
+        if (!_context.ChangeTracker.HasChanges())
         {
-            if (entry.Entity is Entity entity)
-            {
-                if (entry.State == EntityState.Added)
-                {
-                    entity.CreateFieldCreatedAt();
-                }
-
-                if (entry.State == EntityState.Modified)
-                {
-                    entity.UpdateFieldUpdatedAt();
-                }
-            }
+            return;
         }
 
         await _context.SaveChangesAsync();

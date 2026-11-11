@@ -1,6 +1,5 @@
 ﻿using Application.Base;
 using Contracts.Authentications;
-using Contracts.Repositories;
 using Contracts.Repositories.FinancialEntries;
 using Domain.FinancialEntries;
 
@@ -9,13 +8,11 @@ namespace Application.FinancialEntries.CreateFinancialEntry;
 public class CreateFinancialEntryService : IServiceHandler<CreateFinancialEntryRequest, Success>
 {
     private readonly IFinancialEntryRepository _financialEntryRepository;
-    private readonly IUnitOfWork _unitOfWork;
     private readonly IUserAuthenticated _userAuthenticated;
 
-    public CreateFinancialEntryService(IFinancialEntryRepository financialEntryRepository, IUnitOfWork unitOfWork, IUserAuthenticated userAuthenticated)
+    public CreateFinancialEntryService(IFinancialEntryRepository financialEntryRepository, IUserAuthenticated userAuthenticated)
     {
         _financialEntryRepository = financialEntryRepository;
-        _unitOfWork = unitOfWork;
         _userAuthenticated = userAuthenticated;
     }
 
@@ -48,8 +45,6 @@ public class CreateFinancialEntryService : IServiceHandler<CreateFinancialEntryR
             request.AccountId);
 
         await _financialEntryRepository.Add(financialEntry);
-
-        await _unitOfWork.SaveChanges();
     }
 
     private async Task CreateManyFinancialEntry(CreateFinancialEntryRequest request, Guid userId)
@@ -77,7 +72,5 @@ public class CreateFinancialEntryService : IServiceHandler<CreateFinancialEntryR
         }
 
         await _financialEntryRepository.AddRange(financialEntries);
-
-        await _unitOfWork.SaveChanges();
     }
 }

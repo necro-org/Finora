@@ -2,7 +2,6 @@
 using Application.Base;
 using Application.FinancialTypes;
 using Contracts.Authentications;
-using Contracts.Repositories;
 using Contracts.Repositories.FinancialTypes;
 using Contracts.Repositories.Users;
 using Domain.Exceptions;
@@ -17,20 +16,17 @@ public class CreateUserService : IServiceHandler<CreateUserRequest, Authenticati
     private readonly IFinancialTypeRepository _financialTypeRepository;
     private readonly IPasswordHasher _passwordHasher;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
-    private readonly IUnitOfWork _unitOfWork;
 
     public CreateUserService(
         IUserRepository userRepository,
         IFinancialTypeRepository financialTypeRepository,
         IPasswordHasher passwordHasher,
-        IJwtTokenGenerator jwtTokenGenerator,
-        IUnitOfWork unitOfWork)
+        IJwtTokenGenerator jwtTokenGenerator)
     {
         _userRepository = userRepository;
         _financialTypeRepository = financialTypeRepository;
         _passwordHasher = passwordHasher;
         _jwtTokenGenerator = jwtTokenGenerator;
-        _unitOfWork = unitOfWork;
     }
 
     public async Task<AuthenticationResponse> Handle(CreateUserRequest request)
@@ -55,8 +51,6 @@ public class CreateUserService : IServiceHandler<CreateUserRequest, Authenticati
         {
             await _financialTypeRepository.Add(new FinancialType(name, color, user.Id));
         }
-
-        await _unitOfWork.SaveChanges();
 
         var token = _jwtTokenGenerator.GenerateToken(user);
 

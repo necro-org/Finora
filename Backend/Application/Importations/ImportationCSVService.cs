@@ -1,7 +1,6 @@
 using System.Globalization;
 using Application.Base;
 using Contracts.Authentications;
-using Contracts.Repositories;
 using Contracts.Repositories.FinancialEntries;
 using CsvHelper;
 using CsvHelper.Configuration;
@@ -13,18 +12,15 @@ public class ImportationCSVService : IServiceHandler<ImportationCSVRequest, Impo
 {
     private readonly IUserAuthenticated _userAuthenticated;
     private readonly IFinancialEntryRepository _financialEntryRepository;
-    private readonly IUnitOfWork _unitOfWork;
     private readonly IEnumerable<ICsvImporter> _importers;
 
     public ImportationCSVService(
         IUserAuthenticated userAuthenticated,
         IFinancialEntryRepository financialEntryRepository,
-        IUnitOfWork unitOfWork,
         IEnumerable<ICsvImporter> importers)
     {
         _userAuthenticated = userAuthenticated;
         _financialEntryRepository = financialEntryRepository;
-        _unitOfWork = unitOfWork;
         _importers = importers;
     }
 
@@ -46,7 +42,6 @@ public class ImportationCSVService : IServiceHandler<ImportationCSVRequest, Impo
             return new ImportationCSVResponse(0, importer.GetType().Name);
 
         await _financialEntryRepository.AddRange(entries);
-        await _unitOfWork.SaveChanges();
 
         return new ImportationCSVResponse(entries.Count, importer.GetType().Name);
     }

@@ -1,4 +1,5 @@
-﻿using Domain.Exceptions;
+﻿using Contracts.Repositories;
+using Domain.Exceptions;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -8,27 +9,41 @@ public class ServiceHandlerDecorator<TRequest, TResponse> : IServiceHandler<TReq
 {
     private readonly IServiceHandler<TRequest, TResponse> _inner;
     private readonly IValidator<TRequest>? _validator;
+    private readonly IUnitOfWork _unitOfWork;
 
     public ServiceHandlerDecorator(
         IServiceHandler<TRequest, TResponse> inner,
-        IServiceProvider provider)
+        IServiceProvider provider,
+        IUnitOfWork unitOfWork)
     {
         _inner = inner;
         _validator = provider.GetService<IValidator<TRequest>>();
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<TResponse> Handle(TRequest request)
     {
+        await Validate(request);
+
+        var response = await _inner.Handle(request);
+
+        await _unitOfWork.SaveChanges();
+
+        return response;
+    }
+
+    private async Task Validate(TRequest request)
+    {
         if (_validator is null)
         {
-            return await _inner.Handle(request);
+            return;
         }
 
         var validationResult = await _validator.ValidateAsync(request);
 
         if (validationResult.IsValid)
         {
-            return await _inner.Handle(request);
+            return;
         }
 
         var errors = validationResult.Errors

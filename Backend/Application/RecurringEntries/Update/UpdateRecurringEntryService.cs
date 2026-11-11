@@ -1,5 +1,4 @@
 using Application.Base;
-using Contracts.Repositories;
 using Contracts.Repositories.RecurringEntries;
 using Domain.Exceptions;
 
@@ -8,12 +7,10 @@ namespace Application.RecurringEntries.UpdateRecurringEntry;
 public class UpdateRecurringEntryService : IServiceHandler<UpdateRecurringEntryRequest, Success>
 {
     private readonly IRecurringEntryRepository _recurringEntryRepository;
-    private readonly IUnitOfWork _unitOfWork;
 
-    public UpdateRecurringEntryService(IRecurringEntryRepository recurringEntryRepository, IUnitOfWork unitOfWork)
+    public UpdateRecurringEntryService(IRecurringEntryRepository recurringEntryRepository)
     {
         _recurringEntryRepository = recurringEntryRepository;
-        _unitOfWork = unitOfWork;
     }
 
     public async Task<Success> Handle(UpdateRecurringEntryRequest request)
@@ -23,8 +20,6 @@ public class UpdateRecurringEntryService : IServiceHandler<UpdateRecurringEntryR
         if (recurringEntry is null) throw new NotFoundException("Não foi possível encontrar o Lançamento Recorrente");
 
         recurringEntry.Update(request.Description, request.Amount, request.Classification, request.DayOfMonth, request.StartDate, request.EndDate, request.IsActive, request.TypeId, request.AccountId);
-
-        await _unitOfWork.SaveChanges();
 
         return Success.Value;
     }

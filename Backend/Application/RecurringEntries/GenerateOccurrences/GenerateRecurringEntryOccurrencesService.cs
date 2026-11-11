@@ -1,5 +1,4 @@
 using Application.Base;
-using Contracts.Repositories;
 using Contracts.Repositories.FinancialEntries;
 using Contracts.Repositories.RecurringEntries;
 using Domain.FinancialEntries;
@@ -12,18 +11,15 @@ public class GenerateRecurringEntryOccurrencesService : IServiceHandler<Generate
     private readonly IRecurringEntryRepository _recurringEntryRepository;
     private readonly IRecurringEntryOccurrenceRepository _recurringEntryOccurrenceRepository;
     private readonly IFinancialEntryRepository _financialEntryRepository;
-    private readonly IUnitOfWork _unitOfWork;
 
     public GenerateRecurringEntryOccurrencesService(
         IRecurringEntryRepository recurringEntryRepository,
         IRecurringEntryOccurrenceRepository recurringEntryOccurrenceRepository,
-        IFinancialEntryRepository financialEntryRepository,
-        IUnitOfWork unitOfWork)
+        IFinancialEntryRepository financialEntryRepository)
     {
         _recurringEntryRepository = recurringEntryRepository;
         _recurringEntryOccurrenceRepository = recurringEntryOccurrenceRepository;
         _financialEntryRepository = financialEntryRepository;
-        _unitOfWork = unitOfWork;
     }
 
     public async Task<GenerateRecurringEntryOccurrencesResponse> Handle(GenerateRecurringEntryOccurrencesRequest request)
@@ -79,8 +75,6 @@ public class GenerateRecurringEntryOccurrencesService : IServiceHandler<Generate
                 entry.Classification,
                 occurrenceDate));
         }
-
-        await _unitOfWork.SaveChanges();
 
         return new GenerateRecurringEntryOccurrencesResponse(
             processingDate,

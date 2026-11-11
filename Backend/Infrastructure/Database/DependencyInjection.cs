@@ -5,6 +5,7 @@ using Contracts.Repositories.FinancialTypes;
 using Contracts.Repositories.RecurringEntries;
 using Contracts.Repositories.Users;
 using Infrastructure.Database.Context;
+using Infrastructure.Database.Interceptors;
 using Infrastructure.Database.Repositories;
 using Infrastructure.Database.Repositories.FinancialAccounts;
 using Infrastructure.Database.Repositories.FinancialEntries;
@@ -24,10 +25,13 @@ public static class DependencyInjection
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection");
 
+        services.AddSingleton<AuditableEntityInterceptor>();
+
         services.AddDbContext<ApplicationDbContext>(
-            options => options
+            (serviceProvider, options) => options
                 .UseNpgsql(connectionString, npgsqlOptions => npgsqlOptions.MigrationsHistoryTable(HistoryRepository.DefaultTableName, Schemas.Default))
-                .UseSnakeCaseNamingConvention());
+                .UseSnakeCaseNamingConvention()
+                .AddInterceptors(serviceProvider.GetRequiredService<AuditableEntityInterceptor>()));
     }
 
     public static void AddRepositories(this IServiceCollection services)
