@@ -51,4 +51,20 @@ public class RecurringEntry : Entity
         TypeId = typeId;
         AccountId = accountId;
     }
+
+    public DateOnly GetOccurrenceDate(int year, int month)
+    {
+        var day = Math.Min(DayOfMonth, DateTime.DaysInMonth(year, month));
+        return new DateOnly(year, month, day);
+    }
+
+    public bool IsApplicableInMonth(int year, int month)
+    {
+        var firstDayOfMonth = new DateOnly(year, month, 1);
+        var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
+
+        return IsActive
+            && StartDate <= lastDayOfMonth
+            && (EndDate == null || EndDate >= firstDayOfMonth);
+    }
 }

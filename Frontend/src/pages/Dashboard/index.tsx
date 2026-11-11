@@ -22,6 +22,7 @@ import { useDashboardPreferencesStore } from "@stores/dashboardPreferencesStore"
 import useDashboards from "./data/useDashboards";
 import ChartPie from "./components/ChartPie";
 import ChartBar from "./components/ChartBar";
+import RecurringEntriesCard from "./components/RecurringEntriesCard";
 
 export default function Dashboard() {
   const pageTitle = "Painel";
@@ -159,6 +160,10 @@ export default function Dashboard() {
             title="Receitas x Despesas"
             subtitle="Resultado do mês por classificação"
           />
+        </Grid>
+
+        <Grid size={12}>
+          <RecurringEntriesCard data={data?.recurringEntries || []} />
         </Grid>
 
         <Grid size={{ xs: 12, lg: 6 }}>

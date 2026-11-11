@@ -33,14 +33,16 @@ public class GenerateRecurringEntryOccurrencesService : IServiceHandler<Generate
 
         foreach (var entry in activeEntries)
         {
+            var occurrenceDate = entry.GetOccurrenceDate(processingDate.Year, processingDate.Month);
+
+            if (occurrenceDate > processingDate)
+                continue;
+
             var alreadyProcessed = await _recurringEntryOccurrenceRepository
                 .ExistsForMonth(entry.Id, processingDate.Year, processingDate.Month);
 
             if (alreadyProcessed)
                 continue;
-
-            var day = Math.Min(entry.DayOfMonth, DateTime.DaysInMonth(processingDate.Year, processingDate.Month));
-            var occurrenceDate = new DateOnly(processingDate.Year, processingDate.Month, day);
 
             var financialEntry = new FinancialEntry(
                 date: occurrenceDate,

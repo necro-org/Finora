@@ -3,20 +3,28 @@ import { useQuery } from "@tanstack/react-query";
 import api from "@libs/api";
 import { fireError } from "@libs/alert";
 
-import type { RecurringEntryResponse } from "./dtos/RecurringEntryResponse";
+import type { ListRecurringEntriesResponse } from "./dtos/ListRecurringEntriesResponse";
 
 const url = "/RecurringEntries";
 
 export const queryRecurringEntriesList = [url];
 
-export default function useRecurringEntriesList() {
+interface RequestProps {
+  date: string;
+}
+
+export default function useRecurringEntriesList({ date }: RequestProps) {
   async function handleRequest() {
-    const response = await api.get<RecurringEntryResponse[]>(url);
+    const response = await api.get<ListRecurringEntriesResponse[]>(url, {
+      params: {
+        date,
+      },
+    });
     return response.data;
   }
 
   const { error, ...rest } = useQuery({
-    queryKey: queryRecurringEntriesList,
+    queryKey: [...queryRecurringEntriesList, date],
     queryFn: handleRequest,
   });
 

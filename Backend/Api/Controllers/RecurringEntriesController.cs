@@ -4,6 +4,7 @@ using Application.RecurringEntries.Common;
 using Application.RecurringEntries.CreateRecurringEntry;
 using Application.RecurringEntries.DeleteRecurringEntry;
 using Application.RecurringEntries.GetRecurringEntry;
+using Application.RecurringEntries.ListRecurringEntries;
 using Application.RecurringEntries.UpdateRecurringEntry;
 using Microsoft.AspNetCore.Mvc;
 
@@ -34,9 +35,9 @@ public class RecurringEntriesController : ApiController
     }
 
     [HttpGet]
-    public async Task<IActionResult> List(IServiceHandler<Unit, List<RecurringEntryResponse>> service)
+    public async Task<IActionResult> List(IServiceHandler<ListRecurringEntriesRequest, List<ListRecurringEntriesResponse>> service, DateTime date)
     {
-        var response = await service.Handle(Unit.Value);
+        var response = await service.Handle(new ListRecurringEntriesRequest(date));
         return Ok(response);
     }
 

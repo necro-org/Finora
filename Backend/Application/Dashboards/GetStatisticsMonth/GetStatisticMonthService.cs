@@ -4,6 +4,7 @@ using Contracts.Authentications;
 using Contracts.Repositories.FinancialAccounts;
 using Contracts.Repositories.FinancialEntries;
 using Contracts.Repositories.FinancialTypes;
+using Contracts.Repositories.RecurringEntries;
 using Domain.FinancialEntries;
 
 namespace Application.Dashboards.GetStatisticsMonth;
@@ -13,17 +14,23 @@ public class GetStatisticMonthService : IServiceHandler<GetStatisticMonthRequest
     private readonly IFinancialEntryRepository _financialEntryRepository;
     private readonly IFinancialTypeRepository _financialTypeRepository;
     private readonly IFinancialAccountRepository _financialAccountRepository;
+    private readonly IRecurringEntryRepository _recurringEntryRepository;
+    private readonly IRecurringEntryOccurrenceRepository _recurringEntryOccurrenceRepository;
     private readonly IUserAuthenticated _userAuthenticated;
 
     public GetStatisticMonthService(
         IFinancialEntryRepository financialEntryRepository,
         IFinancialTypeRepository financialTypeRepository,
         IFinancialAccountRepository financialAccountRepository,
+        IRecurringEntryRepository recurringEntryRepository,
+        IRecurringEntryOccurrenceRepository recurringEntryOccurrenceRepository,
         IUserAuthenticated userAuthenticated)
     {
         _financialEntryRepository = financialEntryRepository;
         _financialTypeRepository = financialTypeRepository;
         _financialAccountRepository = financialAccountRepository;
+        _recurringEntryRepository = recurringEntryRepository;
+        _recurringEntryOccurrenceRepository = recurringEntryOccurrenceRepository;
         _userAuthenticated = userAuthenticated;
     }
 
@@ -63,6 +70,29 @@ public class GetStatisticMonthService : IServiceHandler<GetStatisticMonthRequest
         accountsResponse = accountsResponse.OrderByDescending(x => x.Value).ToList();
         classificationsResponse = classificationsResponse.OrderByDescending(x => x.Value).ToList();
 
-        return new GetStatisticMonthResponse(financialTypesResponse, classificationsResponse, accountsResponse, classificationsOfYear);
+        var recurringEntriesResponse = await GetRecurringEntriesOfMonth(userId, request.Date.Year, request.Date.Month);
+
+        return new GetStatisticMonthResponse(financialTypesResponse, classificationsResponse, accountsResponse, classificationsOfYear, recurringEntriesResponse);
+    }
+
+    private async Task<List<GetStatisticMonthRecurringEntryResponse>> GetRecurringEntriesOfMonth(Guid userId, int year, int month)
+    {
+        var recurringEntries = await _recurringEntryRepository.GetAll(userId);
+
+        var paidRecurringEntryIds = (await _recurringEntryOccurrenceRepository
+            .GetRecurringEntryIdsWithOccurrenceInMonth(userId, year, month))
+            .ToHashSet();
+
+        return recurringEntries
+            .Where(x => x.IsApplicableInMonth(year, month) || paidRecurringEntryIds.Contains(x.Id))
+            .Select(x => new GetStatisticMonthRecurringEntryResponse(
+                x.Id,
+                x.Description,
+                x.Amount,
+                x.Classification,
+                x.GetOccurrenceDate(year, month),
+                paidRecurringEntryIds.Contains(x.Id)))
+            .OrderBy(x => x.Date)
+            .ToList();
     }
 }
