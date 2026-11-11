@@ -2,7 +2,10 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
 import api from "@libs/api";
-import { decodeJwtPayload } from "@libs/jwt";
+import { AxiosError, HttpStatusCode } from "axios";
+import { toast } from "react-toastify";
+
+import { decodeJwtPayload, getTokenExpiresAt, isTokenValid } from "@libs/jwt";
 
 import AuthContext, { type AuthUser } from "@contexts/AuthContext";
 
@@ -28,7 +31,10 @@ function getUserFromToken(token: string | null): AuthUser | null {
 export default function AuthProvider({ children }: AuthProviderProps) {
   const queryClient = useQueryClient();
 
-  const [token, setToken_] = useState(localStorage.getItem("token"));
+  const [token, setToken_] = useState(() => {
+    const storedToken = localStorage.getItem("token");
+    return isTokenValid(storedToken) ? storedToken : null;
+  });
 
   const setToken = useCallback((newToken: string) => {
     setToken_(newToken);
@@ -38,6 +44,42 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     setToken_(null);
     queryClient.clear();
   }, [queryClient]);
+
+  const expireSession = useCallback(() => {
+    toast.info("Sua sessão expirou, entre novamente", {
+      toastId: "session-expired",
+    });
+    logout();
+  }, [logout]);
+
+  useEffect(() => {
+    const interceptorId = api.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (
+          error instanceof AxiosError &&
+          error.response?.status === HttpStatusCode.Unauthorized
+        ) {
+          expireSession();
+        }
+        return Promise.reject(error);
+      },
+    );
+
+    return () => api.interceptors.response.eject(interceptorId);
+  }, [expireSession]);
+
+  useEffect(() => {
+    const expiresAt = getTokenExpiresAt(token);
+    if (expiresAt === null) return;
+
+    const timeoutId = setTimeout(
+      expireSession,
+      Math.max(expiresAt - Date.now(), 0),
+    );
+
+    return () => clearTimeout(timeoutId);
+  }, [token, expireSession]);
 
   useEffect(() => {
     if (token) {
@@ -52,6 +94,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   const contextValue = useMemo(
     () => ({
       token,
+      isAuthenticated: isTokenValid(token),
       user: getUserFromToken(token),
       setToken,
       logout,

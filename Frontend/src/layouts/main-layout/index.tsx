@@ -15,7 +15,7 @@ import { useLayoutPreferencesStore } from "@stores/layoutPreferencesStore";
 
 export default function MainLayout() {
   const theme = useTheme();
-  const { token } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   const isOverSmViewport = useMediaQuery(theme.breakpoints.up("sm"));
 
@@ -36,8 +36,8 @@ export default function MainLayout() {
 
   const layoutRef = React.useRef<HTMLDivElement>(null);
 
-  if (!token) {
-    return <Navigate to="/" />;
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace />;
   }
 
   return (

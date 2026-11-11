@@ -17,3 +17,17 @@ export function decodeJwtPayload(
     return null;
   }
 }
+
+export function getTokenExpiresAt(token: string | null): number | null {
+  if (!token) return null;
+
+  const expiresAt = decodeJwtPayload(token)?.exp;
+  if (typeof expiresAt !== "number") return null;
+
+  return expiresAt * 1000;
+}
+
+export function isTokenValid(token: string | null): token is string {
+  const expiresAt = getTokenExpiresAt(token);
+  return expiresAt !== null && expiresAt > Date.now();
+}

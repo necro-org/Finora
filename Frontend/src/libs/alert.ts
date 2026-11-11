@@ -71,7 +71,16 @@ function buildMessagesHtml(messages: string[]) {
   return `<ul style="${style};text-align:left;padding-left:1.25rem">${items}</ul>`;
 }
 
+function isUnauthorized(err: unknown) {
+  return (
+    err instanceof AxiosError &&
+    err.response?.status === HttpStatusCode.Unauthorized
+  );
+}
+
 export function fireError(err: unknown) {
+  if (isUnauthorized(err)) return;
+
   const { icon, title, messages } = extractError(err);
 
   Swal.fire({
