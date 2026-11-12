@@ -1,10 +1,10 @@
 ﻿using Api.Controllers.Base;
 using Application.Base;
-using Application.FinancialEntries.CreateFinancialEntry;
-using Application.FinancialEntries.DeleteFinancialEntry;
-using Application.FinancialEntries.GetFinancialEntries;
-using Application.FinancialEntries.ListFinancialEntry;
-using Application.FinancialEntries.UpdateFinancialEntry;
+using Application.FinancialEntries.Create;
+using Application.FinancialEntries.Delete;
+using Application.FinancialEntries.GetById;
+using Application.FinancialEntries.GetAll;
+using Application.FinancialEntries.Update;
 using Contracts.Repositories.FinancialEntries.Dtos;
 using Microsoft.AspNetCore.Mvc;
 
@@ -35,16 +35,16 @@ public class FinancialEntriesController : ApiController
     }
 
     [HttpPost("List")]
-    public async Task<IActionResult> List(IServiceHandler<FinancialEntryFilterDto, List<ListFinancialEntryResponse>> service, FinancialEntryFilterDto request)
+    public async Task<IActionResult> List(IServiceHandler<FinancialEntryFilterDto, List<GetAllFinancialEntriesResponse>> service, FinancialEntryFilterDto request)
     {
         var response = await service.Handle(request);
         return Ok(response);
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> Get(IServiceHandler<GetFinancialEntryRequest, GetFinancialEntryResponse> service, Guid id)
+    public async Task<IActionResult> Get(IServiceHandler<GetFinancialEntryByIdRequest, GetFinancialEntryByIdResponse> service, Guid id)
     {
-        var response = await service.Handle(new GetFinancialEntryRequest(id));
+        var response = await service.Handle(new GetFinancialEntryByIdRequest(id));
         return Ok(response);
     }
 }

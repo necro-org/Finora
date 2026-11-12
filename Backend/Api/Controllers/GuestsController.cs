@@ -2,7 +2,7 @@ using Api.Controllers.Base;
 using Api.Filters;
 using Application.Authentications.Common;
 using Application.Base;
-using Application.Guests.ResetGuest;
+using Application.Guests.Reset;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

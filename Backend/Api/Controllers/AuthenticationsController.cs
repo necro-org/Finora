@@ -1,7 +1,7 @@
 ﻿using Api.Controllers.Base;
 using Application.Authentications.Common;
-using Application.Authentications.CreateUser;
-using Application.Authentications.LoginUser;
+using Application.Authentications.Register;
+using Application.Authentications.Login;
 using Application.Base;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +13,7 @@ public class AuthenticationsController : ApiController
 {
     [AllowAnonymous]
     [HttpPost]
-    public async Task<IActionResult> Register(IServiceHandler<CreateUserRequest, AuthenticationResponse> service, CreateUserRequest request)
+    public async Task<IActionResult> Register(IServiceHandler<RegisterUserRequest, AuthenticationResponse> service, RegisterUserRequest request)
     {
         var response = await service.Handle(request);
         return Ok(response);

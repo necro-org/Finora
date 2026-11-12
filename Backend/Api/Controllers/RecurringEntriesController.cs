@@ -35,16 +35,16 @@ public class RecurringEntriesController : ApiController
     }
 
     [HttpGet]
-    public async Task<IActionResult> List(IServiceHandler<ListRecurringEntriesRequest, List<ListRecurringEntriesResponse>> service, DateTime date)
+    public async Task<IActionResult> List(IServiceHandler<GetAllRecurringEntriesRequest, List<GetAllRecurringEntriesResponse>> service, DateTime date)
     {
-        var response = await service.Handle(new ListRecurringEntriesRequest(date));
+        var response = await service.Handle(new GetAllRecurringEntriesRequest(date));
         return Ok(response);
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> Get(IServiceHandler<GetRecurringEntryRequest, RecurringEntryResponse> service, Guid id)
+    public async Task<IActionResult> Get(IServiceHandler<GetRecurringEntryByIdRequest, RecurringEntryResponse> service, Guid id)
     {
-        var response = await service.Handle(new GetRecurringEntryRequest(id));
+        var response = await service.Handle(new GetRecurringEntryByIdRequest(id));
         return Ok(response);
     }
 }

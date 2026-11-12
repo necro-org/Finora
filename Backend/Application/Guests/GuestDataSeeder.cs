@@ -1,5 +1,5 @@
 using Application.FinancialTypes;
-using Application.Guests.ResetGuest;
+using Application.Guests.Reset;
 using Contracts.Authentications;
 using Contracts.Repositories.FinancialAccounts;
 using Contracts.Repositories.FinancialEntries;

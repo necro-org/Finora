@@ -1,10 +1,10 @@
 ﻿using Api.Controllers.Base;
 using Application.Base;
 using Application.FinancialTypes.Common;
-using Application.FinancialTypes.CreateFinancialType;
-using Application.FinancialTypes.DeleteFinancialType;
-using Application.FinancialTypes.GetFinancialType;
-using Application.FinancialTypes.UpdateFinancialType;
+using Application.FinancialTypes.Create;
+using Application.FinancialTypes.Delete;
+using Application.FinancialTypes.GetById;
+using Application.FinancialTypes.Update;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
@@ -41,9 +41,9 @@ public class FinancialTypesController : ApiController
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> Get(IServiceHandler<GetFinancialTypeRequest, FinancialTypeResponse> service, Guid id)
+    public async Task<IActionResult> Get(IServiceHandler<GetFinancialTypeByIdRequest, FinancialTypeResponse> service, Guid id)
     {
-        var response = await service.Handle(new GetFinancialTypeRequest(id));
+        var response = await service.Handle(new GetFinancialTypeByIdRequest(id));
         return Ok(response);
     }
 }

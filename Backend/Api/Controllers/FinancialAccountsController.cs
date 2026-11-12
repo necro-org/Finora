@@ -1,10 +1,10 @@
 using Api.Controllers.Base;
 using Application.Base;
 using Application.FinancialAccounts.Common;
-using Application.FinancialAccounts.CreateFinancialAccount;
-using Application.FinancialAccounts.DeleteFinancialAccount;
-using Application.FinancialAccounts.GetFinancialAccount;
-using Application.FinancialAccounts.UpdateFinancialAccount;
+using Application.FinancialAccounts.Create;
+using Application.FinancialAccounts.Delete;
+using Application.FinancialAccounts.GetById;
+using Application.FinancialAccounts.Update;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
@@ -41,9 +41,9 @@ public class FinancialAccountsController : ApiController
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> Get(IServiceHandler<GetFinancialAccountRequest, FinancialAccountResponse> service, Guid id)
+    public async Task<IActionResult> Get(IServiceHandler<GetFinancialAccountByIdRequest, FinancialAccountResponse> service, Guid id)
     {
-        var response = await service.Handle(new GetFinancialAccountRequest(id));
+        var response = await service.Handle(new GetFinancialAccountByIdRequest(id));
         return Ok(response);
     }
 }
