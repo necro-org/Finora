@@ -5,12 +5,17 @@ using Contracts.Repositories.FinancialAccounts;
 using Contracts.Repositories.FinancialEntries;
 using Contracts.Repositories.FinancialTypes;
 using Contracts.Repositories.RecurringEntries;
+using Domain.FinancialAccounts;
 using Domain.FinancialEntries;
+using Domain.FinancialTypes;
 
 namespace Application.Dashboards.GetStatisticsMonth;
 
 public class GetStatisticMonthService : IServiceHandler<GetStatisticMonthRequest, GetStatisticMonthResponse>
 {
+    private const string WithoutTypeId = "without-type";
+    private const string WithoutAccountId = "without-account";
+
     private readonly IFinancialEntryRepository _financialEntryRepository;
     private readonly IFinancialTypeRepository _financialTypeRepository;
     private readonly IFinancialAccountRepository _financialAccountRepository;
@@ -39,40 +44,88 @@ public class GetStatisticMonthService : IServiceHandler<GetStatisticMonthRequest
         var userId = _userAuthenticated.GetUserId();
 
         var financialTypesData = await _financialTypeRepository.GetAll(userId);
-        var classificationsData = (ClassificationEnum[])Enum.GetValues(typeof(ClassificationEnum));
         var financialAccountsData = await _financialAccountRepository.GetAll(userId);
         var financialEntriesMonth = await _financialEntryRepository.GetEntriesOfMonth(request.Date, userId, request.DateReference);
+        var financialEntriesPreviousMonth = await _financialEntryRepository.GetEntriesOfMonth(request.Date.AddMonths(-1), userId, request.DateReference);
         var classificationsOfYear = await _financialEntryRepository.GetChartDataOfYear(request.Date, userId, request.DateReference);
 
-        var financialTypesResponse = new List<GetStatisticMonthItemResponse>();
-        var classificationsResponse = new List<GetStatisticMonthItemResponse>();
-        var accountsResponse = new List<GetStatisticMonthItemResponse>();
+        var expenses = financialEntriesMonth.Where(x => x.Classification == ClassificationEnum.Expense).ToList();
+        var revenues = financialEntriesMonth.Where(x => x.Classification == ClassificationEnum.Revenue).ToList();
 
-        foreach (var financialType in financialTypesData)
-        {
-            var sumFinancialType = financialEntriesMonth.Where(x => x.TypeId == financialType.Id).Sum(x => x.Amount);
-            financialTypesResponse.Add(new GetStatisticMonthItemResponse(financialType.Id.ToString(), financialType.Name, financialType.Color, sumFinancialType));
-        }
+        var classificationsResponse = SumByClassification(financialEntriesMonth);
+        var previousMonthClassificationsResponse = SumByClassification(financialEntriesPreviousMonth);
 
-        foreach (var account in financialAccountsData)
-        {
-            var sumAccount= financialEntriesMonth.Where(x => x.AccountId == account.Id).Sum(x => x.Amount);
-            accountsResponse.Add(new GetStatisticMonthItemResponse(account.Id.ToString(), account.Name, account.Color, sumAccount));
-        }
-
-        foreach (var classification in classificationsData)
-        {
-            var sumClassification = financialEntriesMonth.Where(x => x.Classification == classification).Sum(x => x.Amount);
-            classificationsResponse.Add(new GetStatisticMonthItemResponse(classification.ToString(), classification.GetName(), classification.GetColor(), sumClassification));
-        }
-
-        financialTypesResponse = financialTypesResponse.OrderByDescending(x => x.Value).ToList();
-        accountsResponse = accountsResponse.OrderByDescending(x => x.Value).ToList();
-        classificationsResponse = classificationsResponse.OrderByDescending(x => x.Value).ToList();
+        var expensesByTypeResponse = SumByType(expenses, financialTypesData);
+        var revenuesByTypeResponse = SumByType(revenues, financialTypesData);
+        var accountsResponse = SumByAccount(financialEntriesMonth, financialAccountsData);
 
         var recurringEntriesResponse = await GetRecurringEntriesOfMonth(userId, request.Date.Year, request.Date.Month);
 
-        return new GetStatisticMonthResponse(financialTypesResponse, classificationsResponse, accountsResponse, classificationsOfYear, recurringEntriesResponse);
+        return new GetStatisticMonthResponse(
+            expensesByTypeResponse,
+            revenuesByTypeResponse,
+            classificationsResponse,
+            previousMonthClassificationsResponse,
+            accountsResponse,
+            classificationsOfYear,
+            recurringEntriesResponse);
+    }
+
+    private static List<GetStatisticMonthItemResponse> SumByClassification(List<FinancialEntry> entries)
+    {
+        return Enum.GetValues<ClassificationEnum>()
+            .Select(classification => new GetStatisticMonthItemResponse(
+                classification.ToString(),
+                classification.GetName(),
+                classification.GetColor(),
+                entries.Where(x => x.Classification == classification).Sum(x => x.Amount)))
+            .OrderByDescending(x => x.Value)
+            .ToList();
+    }
+
+    private static List<GetStatisticMonthItemResponse> SumByType(List<FinancialEntry> entries, IEnumerable<FinancialType> financialTypes)
+    {
+        var response = financialTypes
+            .Select(type => new GetStatisticMonthItemResponse(
+                type.Id.ToString(),
+                type.Name,
+                type.Color,
+                entries.Where(x => x.TypeId == type.Id).Sum(x => x.Amount)))
+            .ToList();
+
+        var withoutType = entries.Where(x => x.TypeId == null).Sum(x => x.Amount);
+        if (withoutType > 0)
+            response.Add(new GetStatisticMonthItemResponse(WithoutTypeId, "Sem tipo", null, withoutType));
+
+        return response
+            .Where(x => x.Value > 0)
+            .OrderByDescending(x => x.Value)
+            .ToList();
+    }
+
+    private static List<GetStatisticMonthAccountResponse> SumByAccount(List<FinancialEntry> entries, IEnumerable<FinancialAccount> financialAccounts)
+    {
+        var response = financialAccounts
+            .Select(account => ToAccountResponse(account.Id.ToString(), account.Name, account.Color, entries.Where(x => x.AccountId == account.Id)))
+            .ToList();
+
+        response.Add(ToAccountResponse(WithoutAccountId, "Sem conta", null, entries.Where(x => x.AccountId == null)));
+
+        return response
+            .Where(x => x.Revenue > 0 || x.Expense > 0)
+            .OrderByDescending(x => x.Revenue + x.Expense)
+            .ToList();
+    }
+
+    private static GetStatisticMonthAccountResponse ToAccountResponse(string id, string label, string? color, IEnumerable<FinancialEntry> entries)
+    {
+        var entriesList = entries.ToList();
+        return new GetStatisticMonthAccountResponse(
+            id,
+            label,
+            color,
+            entriesList.Where(x => x.Classification == ClassificationEnum.Revenue).Sum(x => x.Amount),
+            entriesList.Where(x => x.Classification == ClassificationEnum.Expense).Sum(x => x.Amount));
     }
 
     private async Task<List<GetStatisticMonthRecurringEntryResponse>> GetRecurringEntriesOfMonth(Guid userId, int year, int month)

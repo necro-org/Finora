@@ -22,7 +22,22 @@ import { useDashboardPreferencesStore } from "@stores/dashboardPreferencesStore"
 import { useDashboard } from "./queries/useDashboard";
 import ChartPie from "./components/ChartPie";
 import ChartBar from "./components/ChartBar";
+import ChartAccounts from "./components/ChartAccounts";
 import RecurringEntriesCard from "./components/RecurringEntriesCard";
+import TrendCaption from "./components/TrendCaption";
+import type { GetStatisticMonthItemResponse } from "./api/types/GetStatisticMonthItemResponse";
+
+function summarize(classifications: GetStatisticMonthItemResponse[] = []) {
+  const sumOf = (classification: ClassificationEnum) =>
+    classifications.find((item) => item.id === classification)?.value ?? 0;
+
+  const revenue = sumOf(ClassificationEnum.Revenue);
+  const expense = sumOf(ClassificationEnum.Expense);
+  const balance = revenue - expense;
+  const savingsRate = revenue > 0 ? (balance / revenue) * 100 : null;
+
+  return { revenue, expense, balance, savingsRate };
+}
 
 export default function Dashboard() {
   const pageTitle = "Painel";
@@ -51,13 +66,15 @@ export default function Dashboard() {
     color: getClassificationColor(item.id, item.color) ?? null,
   }));
 
-  const sumOf = (classification: ClassificationEnum) =>
-    classifications.find((item) => item.id === classification)?.value ?? 0;
+  const { revenue, expense, balance, savingsRate } = summarize(
+    data?.classifications,
+  );
+  const previous = summarize(data?.previousMonthClassifications);
 
-  const revenue = sumOf(ClassificationEnum.Revenue);
-  const expense = sumOf(ClassificationEnum.Expense);
-  const balance = revenue - expense;
-  const savingsRate = revenue > 0 ? (balance / revenue) * 100 : null;
+  const previousMonthLabel = selectedDate
+    .subtract(1, "month")
+    .locale("pt-br")
+    .format("MMMM");
 
   const periodLabel = selectedDate.locale("pt-br").format("MMMM [de] YYYY");
   const periodTitle =
@@ -87,7 +104,14 @@ export default function Dashboard() {
             value={formatCurrency(revenue)}
             icon={<TrendingUpRoundedIcon />}
             color="success"
-            caption="Entradas do mês"
+            caption={
+              <TrendCaption
+                current={revenue}
+                previous={previous.revenue}
+                previousMonthLabel={previousMonthLabel}
+                higherIsBetter
+              />
+            }
             loading={_isLoading}
           />
         </Grid>
@@ -97,7 +121,14 @@ export default function Dashboard() {
             value={formatCurrency(expense)}
             icon={<TrendingDownRoundedIcon />}
             color="error"
-            caption="Saídas do mês"
+            caption={
+              <TrendCaption
+                current={expense}
+                previous={previous.expense}
+                previousMonthLabel={previousMonthLabel}
+                higherIsBetter={false}
+              />
+            }
             loading={_isLoading}
           />
         </Grid>
@@ -108,9 +139,12 @@ export default function Dashboard() {
             icon={<AccountBalanceWalletRoundedIcon />}
             color={balance < 0 ? "error" : "primary"}
             caption={
-              balance < 0
-                ? "Gastou mais do que recebeu"
-                : "Receitas menos despesas"
+              <TrendCaption
+                current={balance}
+                previous={previous.balance}
+                previousMonthLabel={previousMonthLabel}
+                higherIsBetter
+              />
             }
             loading={_isLoading}
           />
@@ -121,7 +155,15 @@ export default function Dashboard() {
             value={savingsRate === null ? "—" : `${savingsRate.toFixed(1)}%`}
             icon={<SavingsRoundedIcon />}
             color="secondary"
-            caption="Parte da receita que sobrou"
+            caption={
+              <TrendCaption
+                current={savingsRate}
+                previous={previous.savingsRate}
+                previousMonthLabel={previousMonthLabel}
+                higherIsBetter
+                unit="points"
+              />
+            }
             loading={_isLoading}
           />
         </Grid>
@@ -165,17 +207,21 @@ export default function Dashboard() {
 
         <Grid size={{ xs: 12, lg: 6 }}>
           <ChartPie
-            data={data?.types || []}
-            title="Por tipo"
-            subtitle="Movimentação do mês em cada tipo"
+            data={data?.expensesByType || []}
+            title="Despesas por tipo"
+            subtitle="Onde o dinheiro foi gasto no mês"
           />
         </Grid>
         <Grid size={{ xs: 12, lg: 6 }}>
           <ChartPie
-            data={data?.accounts || []}
-            title="Por conta"
-            subtitle="Movimentação do mês em cada conta"
+            data={data?.revenuesByType || []}
+            title="Receitas por tipo"
+            subtitle="De onde o dinheiro veio no mês"
           />
+        </Grid>
+
+        <Grid size={12}>
+          <ChartAccounts data={data?.accounts || []} />
         </Grid>
 
         <Grid size={12}>

@@ -27,7 +27,11 @@ export default function ChartPie({
   return (
     <SectionCard title={title} subtitle={subtitle} sx={{ height: "100%" }}>
       {items.length === 0 ? (
-        <Stack alignItems="center" justifyContent="center" sx={{ py: 6 }}>
+        <Stack
+          alignItems="center"
+          justifyContent="center"
+          sx={{ py: 6, height: "100%" }}
+        >
           <Typography variant="body2" color="text.secondary">
             Nenhum lançamento neste mês
           </Typography>
@@ -36,7 +40,9 @@ export default function ChartPie({
         <Stack
           direction={{ xs: "column", sm: "row" }}
           alignItems="center"
-          gap={3}
+          justifyContent="center"
+          gap={{ xs: 3, sm: 5 }}
+          sx={{ height: "100%" }}
         >
           <Box sx={{ position: "relative", flexShrink: 0 }}>
             <PieChart
@@ -72,7 +78,10 @@ export default function ChartPie({
             </Stack>
           </Box>
 
-          <Stack gap={1.25} sx={{ flex: 1, width: "100%", minWidth: 0 }}>
+          <Stack
+            gap={1.25}
+            sx={{ flex: 1, width: "100%", minWidth: 0, maxWidth: 360 }}
+          >
             {items.map((item) => (
               <Stack
                 key={item.id}
