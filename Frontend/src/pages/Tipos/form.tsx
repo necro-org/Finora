@@ -1,4 +1,4 @@
-import { useParams } from "react-router";
+import { Link, useParams } from "react-router";
 
 import PageContainer from "@components/PageContainer";
 import TextField from "@components/TextField";
@@ -12,6 +12,7 @@ import { useCreateFinancialType } from "./mutations/useCreateFinancialType";
 import { useUpdateFinancialType } from "./mutations/useUpdateFinancialType";
 import { useFinancialType } from "./queries/useFinancialType";
 import { useGoTo } from "@hooks/useGoTo";
+import { paths } from "@libs/paths";
 import FetchingLoading from "@components/FetchingLoading";
 import FormProvider from "@components/FormProvider";
 import ColorPicker from "@components/ColorPicker";
@@ -71,7 +72,7 @@ export default function TiposForm() {
           <TextField required label="Nome" name="name" autoFocus />
           <ColorPicker label="Cor" name="color" />
           <Stack direction="row" gap={1} justifyContent="end">
-            <Button onClick={goToTipos} variant="outlined">
+            <Button component={Link} to={paths.tipos()} variant="outlined">
               Cancelar
             </Button>
             <Button

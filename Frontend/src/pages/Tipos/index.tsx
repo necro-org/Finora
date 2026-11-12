@@ -1,7 +1,6 @@
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import AddIcon from "@mui/icons-material/Add";
-import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { GridActionsCellItem } from "@mui/x-data-grid";
 
@@ -11,7 +10,9 @@ import BoxColor from "@components/BoxColor";
 
 import { useFinancialTypes } from "./queries/useFinancialTypes";
 import { useDeleteFinancialType } from "./mutations/useDeleteFinancialType";
-import { useGoTo } from "@hooks/useGoTo";
+import GridEditAction from "@components/GridEditAction";
+import { Link } from "react-router";
+import { paths } from "@libs/paths";
 import { confirmDelete } from "@libs/alert";
 
 export default function Tipos() {
@@ -22,8 +23,6 @@ export default function Tipos() {
   });
   const { mutateAsync } = useDeleteFinancialType();
 
-  const { goToTiposForm } = useGoTo();
-
   return (
     <PageContainer
       title={pageTitle}
@@ -33,7 +32,8 @@ export default function Tipos() {
           <Button
             variant="contained"
             startIcon={<AddIcon />}
-            onClick={() => goToTiposForm()}
+            component={Link}
+            to={paths.tiposForm()}
           >
             Adicionar
           </Button>
@@ -58,12 +58,7 @@ export default function Tipos() {
             type: "actions",
             align: "right",
             getActions: ({ row }) => [
-              <GridActionsCellItem
-                key="edit-item"
-                icon={<EditIcon />}
-                label="Edit"
-                onClick={() => goToTiposForm(row.id)}
-              />,
+              <GridEditAction key="edit-item" to={paths.tiposForm(row.id)} />,
               <GridActionsCellItem
                 key="delete-item"
                 icon={<DeleteIcon />}

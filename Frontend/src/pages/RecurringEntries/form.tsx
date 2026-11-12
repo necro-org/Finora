@@ -1,4 +1,4 @@
-import { useParams } from "react-router";
+import { Link, useParams } from "react-router";
 
 import PageContainer from "@components/PageContainer";
 import TextField from "@components/TextField";
@@ -18,6 +18,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useGoTo } from "@hooks/useGoTo";
+import { paths } from "@libs/paths";
 import { startOfMonth } from "@utils";
 import { ClassificationEnum } from "@pages/Lancamentos/api/types/ClassificationEnum";
 
@@ -168,7 +169,11 @@ export default function RecurringEntriesForm() {
             )}
           </Grid>
           <Stack direction="row" gap={1} justifyContent="end">
-            <Button onClick={goToRecurringEntries} variant="outlined">
+            <Button
+              component={Link}
+              to={paths.recurringEntries()}
+              variant="outlined"
+            >
               Cancelar
             </Button>
             <Button

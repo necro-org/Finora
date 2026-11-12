@@ -1,7 +1,6 @@
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import AddIcon from "@mui/icons-material/Add";
-import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import TrendingUpRoundedIcon from "@mui/icons-material/TrendingUpRounded";
 import TrendingDownRoundedIcon from "@mui/icons-material/TrendingDownRounded";
@@ -20,7 +19,9 @@ import ClassificationChip from "@components/ClassificationChip";
 import { useFinancialEntries } from "./queries/useFinancialEntries";
 import { useDeleteFinancialEntry } from "./mutations/useDeleteFinancialEntry";
 import { ClassificationEnum } from "./api/types/ClassificationEnum";
-import { useGoTo } from "@hooks/useGoTo";
+import GridEditAction from "@components/GridEditAction";
+import { Link } from "react-router";
+import { paths } from "@libs/paths";
 import { confirmDelete } from "@libs/alert";
 import { formatCurrency, formatDateToShow } from "@utils";
 
@@ -44,7 +45,6 @@ export default function Lancamentos() {
   });
 
   const { mutateAsync } = useDeleteFinancialEntry();
-  const { goToLancamentosForm } = useGoTo();
 
   const entries = data || [];
   const sumOf = (classification: ClassificationEnum) =>
@@ -67,7 +67,8 @@ export default function Lancamentos() {
           <Button
             variant="contained"
             startIcon={<AddIcon />}
-            onClick={() => goToLancamentosForm()}
+            component={Link}
+            to={paths.lancamentosForm()}
           >
             Adicionar
           </Button>
@@ -195,11 +196,9 @@ export default function Lancamentos() {
               type: "actions",
               align: "right",
               getActions: ({ row }) => [
-                <GridActionsCellItem
+                <GridEditAction
                   key="edit-item"
-                  icon={<EditIcon />}
-                  label="Editar"
-                  onClick={() => goToLancamentosForm(row.id)}
+                  to={paths.lancamentosForm(row.id)}
                 />,
                 <GridActionsCellItem
                   key="delete-item"

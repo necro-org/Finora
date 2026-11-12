@@ -4,7 +4,9 @@ import AuthCard from "@components/AuthCard";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Link as RouterLink } from "react-router";
 import { useGoTo } from "@hooks/useGoTo";
+import { paths } from "@libs/paths";
 import useAuth from "@hooks/useAuth";
 
 import { useRegister } from "./mutations/useRegister";
@@ -30,7 +32,7 @@ export default function Register() {
   const { mutateAsync, isPending } = useRegister();
 
   const { setToken } = useAuth();
-  const { goToPainel, goToLogin } = useGoTo();
+  const { goToPainel } = useGoTo();
 
   const form = useForm<DataType>({
     resolver: zodResolver(schema),
@@ -96,9 +98,8 @@ export default function Register() {
         <Typography variant="body2" color="text.secondary" textAlign="center">
           Já tem uma conta?{" "}
           <Link
-            component="button"
-            type="button"
-            onClick={() => goToLogin()}
+            component={RouterLink}
+            to={paths.login()}
             variant="body2"
             fontWeight={600}
           >

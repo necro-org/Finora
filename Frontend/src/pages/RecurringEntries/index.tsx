@@ -5,7 +5,6 @@ import Stack from "@mui/material/Stack";
 import Grid from "@mui/material/Grid";
 import Chip from "@mui/material/Chip";
 import AddIcon from "@mui/icons-material/Add";
-import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EventAvailableRoundedIcon from "@mui/icons-material/EventAvailableRounded";
 import TrendingUpRoundedIcon from "@mui/icons-material/TrendingUpRounded";
@@ -20,7 +19,9 @@ import MonthNavigator from "@components/MonthNavigator";
 import RecurringStatusChip from "@components/RecurringStatusChip";
 import AmountText from "@components/AmountText";
 import ClassificationChip from "@components/ClassificationChip";
-import { useGoTo } from "@hooks/useGoTo";
+import GridEditAction from "@components/GridEditAction";
+import { Link } from "react-router";
+import { paths } from "@libs/paths";
 import { confirmDelete } from "@libs/alert";
 import { formatCurrency, formatDate, formatDateToShow } from "@utils";
 import { ClassificationEnum } from "@pages/Lancamentos/api/types/ClassificationEnum";
@@ -47,7 +48,6 @@ export default function RecurringEntries() {
     formatDate(month) as string,
   );
   const { mutateAsync } = useDeleteRecurringEntry();
-  const { goToRecurringEntriesForm } = useGoTo();
 
   const entriesOfMonth = (data || []).filter(
     (x) => x.isApplicableInMonth || x.isPaidInMonth,
@@ -73,7 +73,8 @@ export default function RecurringEntries() {
           <Button
             variant="contained"
             startIcon={<AddIcon />}
-            onClick={() => goToRecurringEntriesForm()}
+            component={Link}
+            to={paths.recurringEntriesForm()}
           >
             Adicionar
           </Button>
@@ -202,11 +203,9 @@ export default function RecurringEntries() {
               type: "actions",
               align: "right",
               getActions: ({ row }) => [
-                <GridActionsCellItem
+                <GridEditAction
                   key="edit-item"
-                  icon={<EditIcon />}
-                  label="Editar"
-                  onClick={() => goToRecurringEntriesForm(row.id)}
+                  to={paths.recurringEntriesForm(row.id)}
                 />,
                 <GridActionsCellItem
                   key="delete-item"

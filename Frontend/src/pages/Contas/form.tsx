@@ -1,4 +1,4 @@
-import { useParams } from "react-router";
+import { Link, useParams } from "react-router";
 
 import PageContainer from "@components/PageContainer";
 import TextField from "@components/TextField";
@@ -12,6 +12,7 @@ import { useCreateFinancialAccount } from "./mutations/useCreateFinancialAccount
 import { useUpdateFinancialAccount } from "./mutations/useUpdateFinancialAccount";
 import { useFinancialAccount } from "./queries/useFinancialAccount";
 import { useGoTo } from "@hooks/useGoTo";
+import { paths } from "@libs/paths";
 import FetchingLoading from "@components/FetchingLoading";
 import FormProvider from "@components/FormProvider";
 import ColorPicker from "@components/ColorPicker";
@@ -75,7 +76,7 @@ export default function ContasForm() {
           <TextField required label="Nome" name="name" autoFocus />
           <ColorPicker label="Cor" name="color" />
           <Stack direction="row" gap={1} justifyContent="end">
-            <Button onClick={goToContas} variant="outlined">
+            <Button component={Link} to={paths.contas()} variant="outlined">
               Cancelar
             </Button>
             <Button

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams } from "react-router";
+import { Link, useParams } from "react-router";
 
 import PageContainer from "@components/PageContainer";
 import TextField from "@components/TextField";
@@ -16,6 +16,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useGoTo } from "@hooks/useGoTo";
+import { paths } from "@libs/paths";
 
 import { useCreateFinancialEntry } from "./mutations/useCreateFinancialEntry";
 import { useUpdateFinancialEntry } from "./mutations/useUpdateFinancialEntry";
@@ -179,7 +180,11 @@ export default function LancamentosForm() {
             )}
 
             <Stack direction="row" gap={1} justifyContent="end">
-              <Button onClick={goToLancamentos} variant="outlined">
+              <Button
+                component={Link}
+                to={paths.lancamentos()}
+                variant="outlined"
+              >
                 Cancelar
               </Button>
               <Button
