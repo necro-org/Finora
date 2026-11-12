@@ -75,8 +75,9 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnType("numeric")
                         .HasColumnName("amount");
 
-                    b.Property<int>("Classification")
-                        .HasColumnType("integer")
+                    b.Property<string>("Classification")
+                        .IsRequired()
+                        .HasColumnType("text")
                         .HasColumnName("classification");
 
                     b.Property<DateTime>("CreatedAt")
@@ -174,8 +175,9 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnType("numeric")
                         .HasColumnName("amount");
 
-                    b.Property<int>("Classification")
-                        .HasColumnType("integer")
+                    b.Property<string>("Classification")
+                        .IsRequired()
+                        .HasColumnType("text")
                         .HasColumnName("classification");
 
                     b.Property<DateTime>("CreatedAt")
