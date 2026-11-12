@@ -37,4 +37,9 @@ public class RecurringEntryOccurrenceRepository : IRecurringEntryOccurrenceRepos
     {
         await _context.RecurringEntryOccurrences.AddAsync(occurrence);
     }
+
+    public async Task<bool> ExistsByRecurringEntryId(Guid recurringEntryId)
+    {
+        return await _context.RecurringEntryOccurrences.AnyAsync(x => x.RecurringEntryId == recurringEntryId);
+    }
 }

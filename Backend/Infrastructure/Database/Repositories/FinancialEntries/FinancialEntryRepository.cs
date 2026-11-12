@@ -110,6 +110,16 @@ public class FinancialEntryRepository : IFinancialEntryRepository
         await _context.FinancialEntries.AddRangeAsync(financialEntries);
     }
 
+    public async Task<bool> ExistsByTypeId(Guid typeId)
+    {
+        return await _context.FinancialEntries.AnyAsync(x => x.TypeId == typeId);
+    }
+
+    public async Task<bool> ExistsByAccountId(Guid accountId)
+    {
+        return await _context.FinancialEntries.AnyAsync(x => x.AccountId == accountId);
+    }
+
     private static IQueryable<FinancialEntry> WhereReferenceDateBetween(
         IQueryable<FinancialEntry> query,
         DateReferenceEnum dateReference,

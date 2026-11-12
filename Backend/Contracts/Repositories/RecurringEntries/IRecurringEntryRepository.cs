@@ -9,4 +9,6 @@ public interface IRecurringEntryRepository
     Task<RecurringEntry?> GetById(Guid id);
     void Remove(RecurringEntry recurringEntry);
     Task<List<RecurringEntry>> GetActiveForProcessing(DateOnly date);
+    Task<bool> ExistsByTypeId(Guid typeId);
+    Task<bool> ExistsByAccountId(Guid accountId);
 }

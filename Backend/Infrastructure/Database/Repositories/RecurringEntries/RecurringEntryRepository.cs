@@ -43,4 +43,14 @@ public class RecurringEntryRepository : IRecurringEntryRepository
             .Where(x => x.IsActive && x.StartDate <= date && (x.EndDate == null || x.EndDate >= date))
             .ToListAsync();
     }
+
+    public async Task<bool> ExistsByTypeId(Guid typeId)
+    {
+        return await _context.RecurringEntries.AnyAsync(x => x.TypeId == typeId);
+    }
+
+    public async Task<bool> ExistsByAccountId(Guid accountId)
+    {
+        return await _context.RecurringEntries.AnyAsync(x => x.AccountId == accountId);
+    }
 }
