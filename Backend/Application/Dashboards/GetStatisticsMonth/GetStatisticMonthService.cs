@@ -3,6 +3,7 @@ using Application.Dashboards.GetStatisticsMonth.Response;
 using Contracts.Authentications;
 using Contracts.Repositories.FinancialAccounts;
 using Contracts.Repositories.FinancialEntries;
+using Contracts.Repositories.FinancialEntries.Dtos;
 using Contracts.Repositories.FinancialTypes;
 using Contracts.Repositories.RecurringEntries;
 using Domain.FinancialAccounts;
@@ -17,6 +18,8 @@ public class GetStatisticMonthService : IServiceHandler<GetStatisticMonthRequest
     private const string WithoutAccountId = "without-account";
     private const int UpcomingPaymentsMonths = 6;
     private const int TopExpensesCount = 5;
+    private const int EvolutionTypesCount = 5;
+    private const string OthersTypeId = "others";
 
     private readonly IFinancialEntryRepository _financialEntryRepository;
     private readonly IFinancialTypeRepository _financialTypeRepository;
@@ -50,6 +53,7 @@ public class GetStatisticMonthService : IServiceHandler<GetStatisticMonthRequest
         var financialEntriesMonth = await _financialEntryRepository.GetEntriesOfMonth(request.Date, userId, request.DateReference);
         var financialEntriesPreviousMonth = await _financialEntryRepository.GetEntriesOfMonth(request.Date.AddMonths(-1), userId, request.DateReference);
         var classificationsOfYear = await _financialEntryRepository.GetChartDataOfYear(request.Date, userId, request.DateReference);
+        var expensesByTypeOfYear = await _financialEntryRepository.GetExpensesByTypeOfYear(request.Date, userId, request.DateReference);
 
         var expenses = financialEntriesMonth.Where(x => x.Classification == ClassificationEnum.Expense).ToList();
         var revenues = financialEntriesMonth.Where(x => x.Classification == ClassificationEnum.Revenue).ToList();
@@ -79,7 +83,48 @@ public class GetStatisticMonthService : IServiceHandler<GetStatisticMonthRequest
             classificationsOfYear,
             recurringEntriesResponse,
             upcomingPayments,
-            GetTopExpenses(expenses, financialTypesData, request.DateReference));
+            GetTopExpenses(expenses, financialTypesData, request.DateReference),
+            GetExpensesByTypeEvolution(expensesByTypeOfYear, financialTypesData));
+    }
+
+    private static List<GetStatisticMonthTypeEvolutionResponse> GetExpensesByTypeEvolution(
+        List<ExpenseByTypeOfMonthDto> expensesByTypeOfYear,
+        IEnumerable<FinancialType> financialTypes)
+    {
+        var typesById = financialTypes.ToDictionary(x => x.Id);
+
+        var topTypeIds = expensesByTypeOfYear
+            .GroupBy(x => x.TypeId)
+            .OrderByDescending(g => g.Sum(x => x.Amount))
+            .Take(EvolutionTypesCount)
+            .Select(g => g.Key)
+            .ToList();
+
+        var response = topTypeIds
+            .Select(typeId =>
+            {
+                var type = typeId.HasValue ? typesById.GetValueOrDefault(typeId.Value) : null;
+                return new GetStatisticMonthTypeEvolutionResponse(
+                    type?.Id.ToString() ?? WithoutTypeId,
+                    type?.Name ?? "Sem tipo",
+                    type?.Color,
+                    SumByMonth(expensesByTypeOfYear.Where(x => x.TypeId == typeId)));
+            })
+            .ToList();
+
+        var others = expensesByTypeOfYear.Where(x => !topTypeIds.Contains(x.TypeId)).ToList();
+        if (others.Count > 0)
+            response.Add(new GetStatisticMonthTypeEvolutionResponse(OthersTypeId, "Outros", null, SumByMonth(others)));
+
+        return response;
+    }
+
+    private static List<decimal> SumByMonth(IEnumerable<ExpenseByTypeOfMonthDto> expenses)
+    {
+        var expensesList = expenses.ToList();
+        return Enumerable.Range(1, 12)
+            .Select(month => expensesList.Where(x => x.Month == month).Sum(x => x.Amount))
+            .ToList();
     }
 
     private static List<GetStatisticMonthTopExpenseResponse> GetTopExpenses(

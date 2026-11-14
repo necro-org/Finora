@@ -3,6 +3,7 @@ import type { GetStatisticMonthAccountResponse } from "./GetStatisticMonthAccoun
 import type { GetStatisticMonthItemResponse } from "./GetStatisticMonthItemResponse";
 import type { GetStatisticMonthRecurringEntryResponse } from "./GetStatisticMonthRecurringEntryResponse";
 import type { GetStatisticMonthTopExpenseResponse } from "./GetStatisticMonthTopExpenseResponse";
+import type { GetStatisticMonthTypeEvolutionResponse } from "./GetStatisticMonthTypeEvolutionResponse";
 import type { UpcomingPaymentDto } from "./UpcomingPaymentDto";
 
 export interface GetStatisticMonthResponse {
@@ -15,4 +16,5 @@ export interface GetStatisticMonthResponse {
   recurringEntries: GetStatisticMonthRecurringEntryResponse[];
   upcomingPayments: UpcomingPaymentDto[];
   topExpenses: GetStatisticMonthTopExpenseResponse[];
+  expensesByTypeOfYear: GetStatisticMonthTypeEvolutionResponse[];
 }

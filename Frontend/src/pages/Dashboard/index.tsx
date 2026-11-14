@@ -27,6 +27,7 @@ import RecurringEntriesCard from "./components/RecurringEntriesCard";
 import TrendCaption from "./components/TrendCaption";
 import UpcomingPaymentsCard from "./components/UpcomingPaymentsCard";
 import TopExpensesCard from "./components/TopExpensesCard";
+import ChartTypeEvolution from "./components/ChartTypeEvolution";
 import type { GetStatisticMonthItemResponse } from "./api/types/GetStatisticMonthItemResponse";
 
 function summarize(classifications: GetStatisticMonthItemResponse[] = []) {
@@ -241,6 +242,13 @@ export default function Dashboard() {
         <Grid size={12}>
           <ChartBar
             data={data?.classificationsOfYear || []}
+            year={selectedDate.year()}
+          />
+        </Grid>
+
+        <Grid size={12}>
+          <ChartTypeEvolution
+            data={data?.expensesByTypeOfYear || []}
             year={selectedDate.year()}
           />
         </Grid>
