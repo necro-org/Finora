@@ -202,7 +202,10 @@ export default function Dashboard() {
         </Grid>
 
         <Grid size={12}>
-          <RecurringEntriesCard data={data?.recurringEntries || []} />
+          <RecurringEntriesCard
+            data={data?.recurringEntries || []}
+            currentBalance={balance}
+          />
         </Grid>
 
         <Grid size={{ xs: 12, lg: 6 }}>

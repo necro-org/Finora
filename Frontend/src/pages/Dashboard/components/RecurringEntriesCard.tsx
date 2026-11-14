@@ -1,4 +1,4 @@
-import { LinearProgress, Stack, Typography } from "@mui/material";
+import { LinearProgress, Stack, Tooltip, Typography } from "@mui/material";
 
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -16,6 +16,7 @@ import type { GetStatisticMonthRecurringEntryResponse } from "../api/types/GetSt
 
 interface RecurringEntriesCardProps {
   data: GetStatisticMonthRecurringEntryResponse[];
+  currentBalance: number;
 }
 
 function sumByClassification(
@@ -29,6 +30,7 @@ function sumByClassification(
 
 export default function RecurringEntriesCard({
   data,
+  currentBalance,
 }: RecurringEntriesCardProps) {
   const pendingEntries = data.filter((x) => !x.isPaid);
   const paidCount = data.length - pendingEntries.length;
@@ -42,6 +44,7 @@ export default function RecurringEntriesCard({
     pendingEntries,
     ClassificationEnum.Expense,
   );
+  const forecastBalance = currentBalance + pendingRevenue - pendingExpense;
 
   return (
     <SectionCard
@@ -88,6 +91,27 @@ export default function RecurringEntriesCard({
                 {formatCurrency(pendingExpense)}
               </Typography>
             </Stack>
+            <Tooltip title="Saldo atual do mês + receitas a entrar - despesas a sair">
+              <Stack
+                sx={{
+                  pl: { sm: 3 },
+                  borderLeft: { sm: 1 },
+                  borderColor: { sm: "divider" },
+                }}
+              >
+                <Typography variant="caption" color="text.secondary">
+                  Fechamento previsto
+                </Typography>
+                <Typography
+                  variant="h6"
+                  lineHeight={1.3}
+                  color={forecastBalance < 0 ? "error.main" : "primary.main"}
+                  sx={{ whiteSpace: "nowrap" }}
+                >
+                  {formatCurrency(forecastBalance)}
+                </Typography>
+              </Stack>
+            </Tooltip>
           </Stack>
 
           <TableContainer>
