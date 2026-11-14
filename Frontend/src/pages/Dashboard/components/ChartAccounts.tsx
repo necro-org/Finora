@@ -1,3 +1,4 @@
+import { Box } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 
 import SectionCard from "@components/SectionCard";
@@ -20,7 +21,7 @@ const MIN_HEIGHT = 200;
 export default function ChartAccounts({ data }: ChartAccountsProps) {
   const getClassificationColor = useClassificationColor();
 
-  const height = Math.max(
+  const minHeight = Math.max(
     MIN_HEIGHT,
     data.length * BAR_HEIGHT_PER_ACCOUNT + 80,
   );
@@ -29,45 +30,47 @@ export default function ChartAccounts({ data }: ChartAccountsProps) {
     <SectionCard
       title="Por conta"
       subtitle="Entradas e saídas do mês em cada conta"
+      sx={{ height: "100%" }}
     >
-      <BarChart
-        layout="horizontal"
-        height={height}
-        borderRadius={6}
-        yAxis={[
-          {
-            scaleType: "band",
-            data: data.map((item) => item.label),
-            width: 110,
-          },
-        ]}
-        xAxis={[
-          {
-            valueFormatter: (value: number) =>
-              new Intl.NumberFormat("pt-BR", { notation: "compact" }).format(
-                value,
-              ),
-          },
-        ]}
-        series={[
-          {
-            label: ClassificationLabel.Revenue,
-            color: getClassificationColor(ClassificationEnum.Revenue),
-            valueFormatter: (value: number | null) => formatCurrency(value),
-            data: data.map((item) => item.revenue),
-          },
-          {
-            label: ClassificationLabel.Expense,
-            color: getClassificationColor(ClassificationEnum.Expense),
-            valueFormatter: (value: number | null) => formatCurrency(value),
-            data: data.map((item) => item.expense),
-          },
-        ]}
-        grid={{ vertical: true }}
-        localeText={{
-          noData: "Nenhum lançamento neste mês",
-        }}
-      />
+      <Box sx={{ height: "100%", minHeight }}>
+        <BarChart
+          layout="horizontal"
+          borderRadius={6}
+          yAxis={[
+            {
+              scaleType: "band",
+              data: data.map((item) => item.label),
+              width: 110,
+            },
+          ]}
+          xAxis={[
+            {
+              valueFormatter: (value: number) =>
+                new Intl.NumberFormat("pt-BR", { notation: "compact" }).format(
+                  value,
+                ),
+            },
+          ]}
+          series={[
+            {
+              label: ClassificationLabel.Revenue,
+              color: getClassificationColor(ClassificationEnum.Revenue),
+              valueFormatter: (value: number | null) => formatCurrency(value),
+              data: data.map((item) => item.revenue),
+            },
+            {
+              label: ClassificationLabel.Expense,
+              color: getClassificationColor(ClassificationEnum.Expense),
+              valueFormatter: (value: number | null) => formatCurrency(value),
+              data: data.map((item) => item.expense),
+            },
+          ]}
+          grid={{ vertical: true }}
+          localeText={{
+            noData: "Nenhum lançamento neste mês",
+          }}
+        />
+      </Box>
     </SectionCard>
   );
 }

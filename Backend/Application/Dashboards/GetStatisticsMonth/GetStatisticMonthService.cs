@@ -16,6 +16,7 @@ public class GetStatisticMonthService : IServiceHandler<GetStatisticMonthRequest
     private const string WithoutTypeId = "without-type";
     private const string WithoutAccountId = "without-account";
     private const int UpcomingPaymentsMonths = 6;
+    private const int TopExpensesCount = 5;
 
     private readonly IFinancialEntryRepository _financialEntryRepository;
     private readonly IFinancialTypeRepository _financialTypeRepository;
@@ -77,7 +78,27 @@ public class GetStatisticMonthService : IServiceHandler<GetStatisticMonthRequest
             accountsResponse,
             classificationsOfYear,
             recurringEntriesResponse,
-            upcomingPayments);
+            upcomingPayments,
+            GetTopExpenses(expenses, financialTypesData, request.DateReference));
+    }
+
+    private static List<GetStatisticMonthTopExpenseResponse> GetTopExpenses(
+        List<FinancialEntry> expenses,
+        IEnumerable<FinancialType> financialTypes,
+        DateReferenceEnum dateReference)
+    {
+        var typesById = financialTypes.ToDictionary(x => x.Id);
+
+        return expenses
+            .OrderByDescending(x => x.Amount)
+            .Take(TopExpensesCount)
+            .Select(x =>
+            {
+                var type = x.TypeId.HasValue ? typesById.GetValueOrDefault(x.TypeId.Value) : null;
+                var referenceDate = dateReference == DateReferenceEnum.PaymentDate ? x.DatePayment ?? x.Date : x.Date;
+                return new GetStatisticMonthTopExpenseResponse(x.Id, x.Description, x.Amount, referenceDate, type?.Name, type?.Color);
+            })
+            .ToList();
     }
 
     private static List<GetStatisticMonthItemResponse> SumByClassification(List<FinancialEntry> entries)

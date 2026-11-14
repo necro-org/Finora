@@ -2,6 +2,7 @@ import type { ChartDataOfYearDto } from "./ChartDataOfYearDto";
 import type { GetStatisticMonthAccountResponse } from "./GetStatisticMonthAccountResponse";
 import type { GetStatisticMonthItemResponse } from "./GetStatisticMonthItemResponse";
 import type { GetStatisticMonthRecurringEntryResponse } from "./GetStatisticMonthRecurringEntryResponse";
+import type { GetStatisticMonthTopExpenseResponse } from "./GetStatisticMonthTopExpenseResponse";
 import type { UpcomingPaymentDto } from "./UpcomingPaymentDto";
 
 export interface GetStatisticMonthResponse {
@@ -13,4 +14,5 @@ export interface GetStatisticMonthResponse {
   classificationsOfYear: ChartDataOfYearDto[];
   recurringEntries: GetStatisticMonthRecurringEntryResponse[];
   upcomingPayments: UpcomingPaymentDto[];
+  topExpenses: GetStatisticMonthTopExpenseResponse[];
 }

@@ -10,4 +10,5 @@ public record GetStatisticMonthResponse(
     List<GetStatisticMonthAccountResponse> Accounts,
     List<ChartDataOfYearDto> ClassificationsOfYear,
     List<GetStatisticMonthRecurringEntryResponse> RecurringEntries,
-    List<UpcomingPaymentDto> UpcomingPayments);
+    List<UpcomingPaymentDto> UpcomingPayments,
+    List<GetStatisticMonthTopExpenseResponse> TopExpenses);
