@@ -90,6 +90,26 @@ public class FinancialEntryRepository : IFinancialEntryRepository
             .ToList();
     }
 
+    public async Task<List<UpcomingPaymentDto>> GetUpcomingPayments(Guid userId, DateOnly initialDate, DateOnly finalDate, DateReferenceEnum dateReference)
+    {
+        var expenses = WhereReferenceDateBetween(
+            _context.FinancialEntries.Where(x => x.UserId == userId && x.Classification == ClassificationEnum.Expense),
+            dateReference,
+            initialDate,
+            finalDate);
+
+        var expensesWithReferenceDate = dateReference == DateReferenceEnum.PaymentDate
+            ? expenses.Select(x => new { ReferenceDate = x.DatePayment ?? x.Date, x.Amount })
+            : expenses.Select(x => new { ReferenceDate = x.Date, x.Amount });
+
+        return await expensesWithReferenceDate
+            .GroupBy(x => new { x.ReferenceDate.Year, x.ReferenceDate.Month })
+            .OrderBy(g => g.Key.Year)
+            .ThenBy(g => g.Key.Month)
+            .Select(g => new UpcomingPaymentDto(g.Key.Year, g.Key.Month, g.Sum(x => x.Amount), g.Count()))
+            .ToListAsync();
+    }
+
     public async Task Add(FinancialEntry financialEntry)
     {
         await _context.FinancialEntries.AddAsync(financialEntry);

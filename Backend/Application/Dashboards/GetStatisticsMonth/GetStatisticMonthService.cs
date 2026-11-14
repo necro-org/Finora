@@ -15,6 +15,7 @@ public class GetStatisticMonthService : IServiceHandler<GetStatisticMonthRequest
 {
     private const string WithoutTypeId = "without-type";
     private const string WithoutAccountId = "without-account";
+    private const int UpcomingPaymentsMonths = 6;
 
     private readonly IFinancialEntryRepository _financialEntryRepository;
     private readonly IFinancialTypeRepository _financialTypeRepository;
@@ -61,6 +62,13 @@ public class GetStatisticMonthService : IServiceHandler<GetStatisticMonthRequest
 
         var recurringEntriesResponse = await GetRecurringEntriesOfMonth(userId, request.Date.Year, request.Date.Month);
 
+        var firstDayOfNextMonth = new DateOnly(request.Date.Year, request.Date.Month, 1).AddMonths(1);
+        var upcomingPayments = await _financialEntryRepository.GetUpcomingPayments(
+            userId,
+            firstDayOfNextMonth,
+            firstDayOfNextMonth.AddMonths(UpcomingPaymentsMonths).AddDays(-1),
+            request.DateReference);
+
         return new GetStatisticMonthResponse(
             expensesByTypeResponse,
             revenuesByTypeResponse,
@@ -68,7 +76,8 @@ public class GetStatisticMonthService : IServiceHandler<GetStatisticMonthRequest
             previousMonthClassificationsResponse,
             accountsResponse,
             classificationsOfYear,
-            recurringEntriesResponse);
+            recurringEntriesResponse,
+            upcomingPayments);
     }
 
     private static List<GetStatisticMonthItemResponse> SumByClassification(List<FinancialEntry> entries)

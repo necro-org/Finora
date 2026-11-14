@@ -25,6 +25,7 @@ import ChartBar from "./components/ChartBar";
 import ChartAccounts from "./components/ChartAccounts";
 import RecurringEntriesCard from "./components/RecurringEntriesCard";
 import TrendCaption from "./components/TrendCaption";
+import UpcomingPaymentsCard from "./components/UpcomingPaymentsCard";
 import type { GetStatisticMonthItemResponse } from "./api/types/GetStatisticMonthItemResponse";
 
 function summarize(classifications: GetStatisticMonthItemResponse[] = []) {
@@ -201,11 +202,14 @@ export default function Dashboard() {
           />
         </Grid>
 
-        <Grid size={12}>
+        <Grid size={{ xs: 12, lg: 8 }}>
           <RecurringEntriesCard
             data={data?.recurringEntries || []}
             currentBalance={balance}
           />
+        </Grid>
+        <Grid size={{ xs: 12, lg: 4 }}>
+          <UpcomingPaymentsCard data={data?.upcomingPayments || []} />
         </Grid>
 
         <Grid size={{ xs: 12, lg: 6 }}>
