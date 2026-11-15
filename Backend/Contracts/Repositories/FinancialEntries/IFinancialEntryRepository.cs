@@ -9,7 +9,7 @@ public interface IFinancialEntryRepository
     Task<List<FinancialEntry>> GetEntriesOfMonth(DateTime date, Guid userId, DateReferenceEnum dateReference);
     Task<List<ChartDataOfYearDto>> GetChartDataOfYear(DateTime date, Guid userId, DateReferenceEnum dateReference);
     Task<List<ExpenseByTypeOfMonthDto>> GetExpensesByTypeOfYear(DateTime date, Guid userId, DateReferenceEnum dateReference);
-    Task<List<UpcomingPaymentDto>> GetUpcomingPayments(Guid userId, DateOnly initialDate, DateOnly finalDate, DateReferenceEnum dateReference);
+    Task<List<UpcomingPaymentDto>> GetUpcomingPayments(Guid userId, DateOnly initialDate, DateOnly finalDate);
     Task Add(FinancialEntry financialEntry);
     Task<FinancialEntry?> GetById(Guid id);
     void Remove(FinancialEntry financialEntry);

@@ -71,8 +71,7 @@ public class GetStatisticMonthService : IServiceHandler<GetStatisticMonthRequest
         var upcomingPayments = await _financialEntryRepository.GetUpcomingPayments(
             userId,
             firstDayOfNextMonth,
-            firstDayOfNextMonth.AddMonths(UpcomingPaymentsMonths).AddDays(-1),
-            request.DateReference);
+            firstDayOfNextMonth.AddMonths(UpcomingPaymentsMonths).AddDays(-1));
 
         return new GetStatisticMonthResponse(
             expensesByTypeResponse,
