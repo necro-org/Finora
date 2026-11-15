@@ -197,18 +197,18 @@ public class GuestDataSeeder
 
             foreach (var entry in monthEntries.Where(x => x.Date <= today))
             {
-                var datePayment = entry.AccountName == CreditCard
+                var invoiceDate = entry.AccountName == CreditCard
                     ? new DateOnly(entry.Date.Year, entry.Date.Month, 10).AddMonths(1)
                     : entry.Date;
 
                 financialEntries.Add(new FinancialEntry(
-                    entry.Date,
+                    invoiceDate,
                     entry.Amount,
                     entry.Classification,
                     guest.Id,
                     types[entry.TypeName].Id,
                     entry.Description,
-                    datePayment,
+                    entry.Date,
                     accounts[entry.AccountName].Id));
             }
         }
