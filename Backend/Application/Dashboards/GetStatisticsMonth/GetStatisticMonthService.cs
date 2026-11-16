@@ -139,7 +139,7 @@ public class GetStatisticMonthService : IServiceHandler<GetStatisticMonthRequest
             .Select(x =>
             {
                 var type = x.TypeId.HasValue ? typesById.GetValueOrDefault(x.TypeId.Value) : null;
-                var referenceDate = dateReference == DateReferenceEnum.PaymentDate ? x.DatePayment ?? x.Date : x.Date;
+                var referenceDate = dateReference == DateReferenceEnum.TransactionDate ? x.TransactionDate ?? x.Date : x.Date;
                 return new GetStatisticMonthTopExpenseResponse(x.Id, x.Description, x.Amount, referenceDate, type?.Name, type?.Color);
             })
             .ToList();

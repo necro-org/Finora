@@ -9,5 +9,5 @@ public record UpdateFinancialEntryRequest(
     Guid TypeId,
     ClassificationEnum Classification,
     string? Description,
-    DateOnly? DatePayment,
+    DateOnly? TransactionDate,
     Guid? AccountId);

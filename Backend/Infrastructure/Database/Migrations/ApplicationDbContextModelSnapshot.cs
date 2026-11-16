@@ -88,13 +88,13 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnType("date")
                         .HasColumnName("date");
 
-                    b.Property<DateOnly?>("DatePayment")
-                        .HasColumnType("date")
-                        .HasColumnName("date_payment");
-
                     b.Property<string>("Description")
                         .HasColumnType("text")
                         .HasColumnName("description");
+
+                    b.Property<DateOnly?>("TransactionDate")
+                        .HasColumnType("date")
+                        .HasColumnName("transaction_date");
 
                     b.Property<Guid?>("TypeId")
                         .HasColumnType("uuid")

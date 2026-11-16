@@ -5,7 +5,7 @@ namespace Application.FinancialEntries.GetAll;
 public record GetAllFinancialEntriesResponse(
     Guid Id,
     DateOnly Date,
-    DateOnly? DatePayment,
+    DateOnly? TransactionDate,
     decimal Amount,
     Guid? TypeId,
     string? TypeName,

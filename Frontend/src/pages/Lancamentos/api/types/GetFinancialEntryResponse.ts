@@ -8,6 +8,6 @@ export interface GetFinancialEntryResponse {
   accountId: string | null;
   classification: ClassificationEnum;
   description: string | null;
-  datePayment: string | null;
+  transactionDate: string | null;
   isConfirmed: boolean;
 }

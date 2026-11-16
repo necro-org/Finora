@@ -25,7 +25,7 @@ public sealed class NubankFaturaImporter : ICsvImporter
         return csv.GetRecords<NubankFaturaTemplateCSV>()
             .Select(x => FinancialEntry.FromImport(
                 date: dateFinancialEntry,
-                datePayment: x.Date,
+                transactionDate: x.Date,
                 amount: Math.Abs(x.Amount),
                 classification: ClassificationEnum.Expense,
                 userId: userId,

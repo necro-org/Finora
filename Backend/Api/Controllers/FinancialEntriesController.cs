@@ -16,7 +16,7 @@ public class FinancialEntriesController : ApiController
     [HttpPost]
     public async Task<IActionResult> Create(IServiceHandler<CreateFinancialEntryRequest, Success> service, DateOnly? replicateUntilDate, CreateFinancialEntryRequest request)
     {
-        await service.Handle(new CreateFinancialEntryRequest(replicateUntilDate, request.Date, request.Amount, request.TypeId, request.Classification, request.Description, request.DatePayment, request.AccountId));
+        await service.Handle(new CreateFinancialEntryRequest(replicateUntilDate, request.Date, request.Amount, request.TypeId, request.Classification, request.Description, request.TransactionDate, request.AccountId));
         return Ok();
     }
 

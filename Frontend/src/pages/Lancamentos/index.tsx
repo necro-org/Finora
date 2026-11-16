@@ -142,8 +142,8 @@ export default function Lancamentos() {
               valueFormatter: formatDateToShow,
             },
             {
-              field: "datePayment",
-              headerName: "Data de pagamento",
+              field: "transactionDate",
+              headerName: "Data da transação",
               minWidth: 140,
               valueFormatter: (value: string | null) =>
                 formatDateToShow(value) || "—",

@@ -40,7 +40,7 @@ const schema = z.object({
     error: () => ({ message: "Informe uma Classificação" }),
   }),
   description: z.string().nullable(),
-  datePayment: z.string().nullable(),
+  transactionDate: z.string().nullable(),
   accountId: z.guid().nullable(),
 });
 
@@ -81,7 +81,7 @@ export default function LancamentosForm() {
       amount: 0,
       description: null,
       classification: "Expense",
-      datePayment: null,
+      transactionDate: null,
       date: todayDate(),
       accountId: null,
     },
@@ -121,7 +121,7 @@ export default function LancamentosForm() {
               <DatePicker label="Data" name="date" required />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
-              <DatePicker label="Data de Pagamento" name="datePayment" />
+              <DatePicker label="Data da Transação" name="transactionDate" />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
               <CurrencyTextField

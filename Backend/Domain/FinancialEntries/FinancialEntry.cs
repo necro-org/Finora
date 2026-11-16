@@ -11,7 +11,7 @@ public class FinancialEntry : Entity
     public decimal Amount { get; protected set; }
     public ClassificationEnum Classification { get; protected set; }
     public string? Description { get; protected set; }
-    public DateOnly? DatePayment { get; protected set; }
+    public DateOnly? TransactionDate { get; protected set; }
     public Guid UserId { get; protected set; }
     public User User { get; protected set; }
     public Guid? TypeId { get; protected set; }
@@ -23,7 +23,7 @@ public class FinancialEntry : Entity
 
     protected FinancialEntry() { }
 
-    public FinancialEntry(DateOnly date, decimal amount, ClassificationEnum classification, Guid userId, Guid typeId, string? description, DateOnly? datePayment, Guid? accountId)
+    public FinancialEntry(DateOnly date, decimal amount, ClassificationEnum classification, Guid userId, Guid typeId, string? description, DateOnly? transactionDate, Guid? accountId)
     {
         Date = date;
         Amount = amount;
@@ -31,27 +31,27 @@ public class FinancialEntry : Entity
         UserId = userId;
         TypeId = typeId;
         Description = description;
-        DatePayment = datePayment;
+        TransactionDate = transactionDate;
         AccountId = accountId;
     }
 
-    public void Update(DateOnly date, decimal amount, ClassificationEnum classification, Guid typeId, string? description, DateOnly? datePayment, Guid? accountId)
+    public void Update(DateOnly date, decimal amount, ClassificationEnum classification, Guid typeId, string? description, DateOnly? transactionDate, Guid? accountId)
     {
         Date = date;
         Amount = amount;
         Classification = classification;
         TypeId = typeId;
         Description = description;
-        DatePayment = datePayment;
+        TransactionDate = transactionDate;
         AccountId = accountId;
     }
 
-    public static FinancialEntry FromImport(DateOnly date, DateOnly datePayment, decimal amount, ClassificationEnum classification, Guid userId, string? description, Guid? accountId)
+    public static FinancialEntry FromImport(DateOnly date, DateOnly transactionDate, decimal amount, ClassificationEnum classification, Guid userId, string? description, Guid? accountId)
     {
         return new FinancialEntry
         {
             Date = date,
-            DatePayment = datePayment,
+            TransactionDate = transactionDate,
             Amount = amount,
             Classification = classification,
             UserId = userId,

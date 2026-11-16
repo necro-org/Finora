@@ -57,7 +57,7 @@ public class GenerateRecurringEntryOccurrencesService : IServiceHandler<Generate
                 userId: entry.UserId,
                 typeId: entry.TypeId,
                 description: entry.Description,
-                datePayment: occurrenceDate,
+                transactionDate: occurrenceDate,
                 accountId: entry.AccountId);
 
             await _financialEntryRepository.Add(financialEntry);

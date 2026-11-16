@@ -62,8 +62,8 @@ public class FinancialEntryRepository : IFinancialEntryRepository
             firstDayOfYear,
             lastDayOfYear);
 
-        var entriesWithReferenceDate = dateReference == DateReferenceEnum.PaymentDate
-            ? entriesOfYear.Select(x => new { ReferenceDate = x.DatePayment ?? x.Date, x.Classification, x.Amount })
+        var entriesWithReferenceDate = dateReference == DateReferenceEnum.TransactionDate
+            ? entriesOfYear.Select(x => new { ReferenceDate = x.TransactionDate ?? x.Date, x.Classification, x.Amount })
             : entriesOfYear.Select(x => new { ReferenceDate = x.Date, x.Classification, x.Amount });
 
         var result = await entriesWithReferenceDate
@@ -98,8 +98,8 @@ public class FinancialEntryRepository : IFinancialEntryRepository
             new DateOnly(date.Year, 1, 1),
             new DateOnly(date.Year, 12, 31));
 
-        var expensesWithReferenceDate = dateReference == DateReferenceEnum.PaymentDate
-            ? expensesOfYear.Select(x => new { ReferenceDate = x.DatePayment ?? x.Date, x.TypeId, x.Amount })
+        var expensesWithReferenceDate = dateReference == DateReferenceEnum.TransactionDate
+            ? expensesOfYear.Select(x => new { ReferenceDate = x.TransactionDate ?? x.Date, x.TypeId, x.Amount })
             : expensesOfYear.Select(x => new { ReferenceDate = x.Date, x.TypeId, x.Amount });
 
         return await expensesWithReferenceDate
@@ -156,11 +156,11 @@ public class FinancialEntryRepository : IFinancialEntryRepository
         DateOnly? initialDate,
         DateOnly? finalDate)
     {
-        if (dateReference == DateReferenceEnum.PaymentDate)
+        if (dateReference == DateReferenceEnum.TransactionDate)
         {
             return query
-                .Where(x => initialDate == null || (x.DatePayment ?? x.Date) >= initialDate)
-                .Where(x => finalDate == null || (x.DatePayment ?? x.Date) <= finalDate);
+                .Where(x => initialDate == null || (x.TransactionDate ?? x.Date) >= initialDate)
+                .Where(x => finalDate == null || (x.TransactionDate ?? x.Date) <= finalDate);
         }
 
         return query

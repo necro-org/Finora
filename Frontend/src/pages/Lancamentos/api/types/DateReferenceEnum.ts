@@ -1,6 +1,6 @@
 export const DateReferenceEnum = {
   EntryDate: "EntryDate",
-  PaymentDate: "PaymentDate",
+  TransactionDate: "TransactionDate",
 } as const;
 
 export type DateReferenceEnum =
@@ -8,5 +8,5 @@ export type DateReferenceEnum =
 
 export const DateReferenceLabel = {
   EntryDate: "Lançamento",
-  PaymentDate: "Pagamento",
+  TransactionDate: "Transação",
 };

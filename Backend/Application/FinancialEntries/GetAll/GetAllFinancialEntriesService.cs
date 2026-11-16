@@ -27,7 +27,7 @@ public class GetAllFinancialEntriesService : IServiceHandler<FinancialEntryFilte
             .Select(x => new GetAllFinancialEntriesResponse(
                 x.Id,
                 x.Date,
-                x.DatePayment,
+                x.TransactionDate,
                 x.Amount,
                 x.TypeId,
                 x.Type?.Name,

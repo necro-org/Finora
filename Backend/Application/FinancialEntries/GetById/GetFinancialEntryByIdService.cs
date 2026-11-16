@@ -27,7 +27,7 @@ public class GetFinancialEntryByIdService : IServiceHandler<GetFinancialEntryByI
             financialEntry.AccountId,
             financialEntry.Classification,
             financialEntry.Description,
-            financialEntry.DatePayment,
+            financialEntry.TransactionDate,
             financialEntry.IsConfirmed);
     }
 }

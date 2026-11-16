@@ -26,9 +26,9 @@ const OPTIONS = [
     hint: "Considera a data em que o lançamento foi registrado, por exemplo o mês da fatura",
   },
   {
-    value: DateReferenceEnum.PaymentDate,
+    value: DateReferenceEnum.TransactionDate,
     icon: <PaymentsRoundedIcon />,
-    hint: "Considera a data em que a compra foi feita de fato. Sem data de pagamento, usa a de lançamento",
+    hint: "Considera a data em que a transação aconteceu, por exemplo o dia da compra no cartão. Sem data da transação, usa a de lançamento",
   },
 ];
 

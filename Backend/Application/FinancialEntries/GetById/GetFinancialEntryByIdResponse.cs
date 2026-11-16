@@ -10,5 +10,5 @@ public record GetFinancialEntryByIdResponse(
     Guid? AccountId,
     ClassificationEnum Classification,
     string? Description,
-    DateOnly? DatePayment,
+    DateOnly? TransactionDate,
     bool IsConfirmed);

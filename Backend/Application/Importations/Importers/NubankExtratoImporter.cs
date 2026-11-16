@@ -25,7 +25,7 @@ public sealed class NubankExtratoImporter : ICsvImporter
         return csv.GetRecords<NubankExtratoTemplateCSV>()
             .Select(x => FinancialEntry.FromImport(
                 date: dateFinancialEntry,
-                datePayment: x.Data,
+                transactionDate: x.Data,
                 amount: Math.Abs(x.Valor),
                 classification: x.Valor < 0 ? ClassificationEnum.Expense : ClassificationEnum.Revenue,
                 userId: userId,

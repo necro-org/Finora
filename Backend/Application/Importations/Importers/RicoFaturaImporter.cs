@@ -25,7 +25,7 @@ public sealed class RicoFaturaImporter : ICsvImporter
         return csv.GetRecords<RicoFaturaTemplateCSV>()
             .Select(x => FinancialEntry.FromImport(
                 date: dateFinancialEntry,
-                datePayment: x.Data,
+                transactionDate: x.Data,
                 amount: Math.Abs(x.Valor),
                 classification: ClassificationEnum.Expense,
                 userId: userId,
