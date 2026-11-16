@@ -9,7 +9,7 @@ public static class DependencyInjection
 {
     public static void AddApi(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddScoped<ApiKeyAuthorizationFilter>();
+        services.AddScoped<SchedulerApiKeyFilter>();
         services.AddControllers()
             .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
         services.AddHttpContextAccessor();

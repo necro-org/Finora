@@ -12,7 +12,7 @@ namespace Api.Controllers;
 public class RecurringJobsController : ApiController
 {
     [HttpPost("generate-occurrences")]
-    [ApiKeyAuthorization]
+    [SchedulerApiKey]
     public async Task<IActionResult> GenerateOccurrences(
         [FromServices] IServiceHandler<GenerateRecurringEntryOccurrencesRequest, GenerateRecurringEntryOccurrencesResponse> service)
     {

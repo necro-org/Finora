@@ -20,7 +20,7 @@ public class GuestsController : ApiController
     }
 
     [HttpPost]
-    [ApiKeyAuthorization]
+    [SchedulerApiKey]
     public async Task<IActionResult> Reset(IServiceHandler<Unit, ResetGuestResponse> service)
     {
         var response = await service.Handle(Unit.Value);
