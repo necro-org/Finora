@@ -1,22 +1,37 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import {
+  createSerializer,
+  parseAsBoolean,
+  parseAsFloat,
+  parseAsString,
+  parseAsStringLiteral,
+  useQueryStates,
+  type inferParserType,
+} from "nuqs";
 
-import type { ClassificationEnum } from "@pages/Lancamentos/api/types/ClassificationEnum";
+import { ClassificationEnum } from "@pages/Lancamentos/api/types/ClassificationEnum";
 import { DateReferenceEnum } from "@pages/Lancamentos/api/types/DateReferenceEnum";
 import { endOfMonth, startOfMonth } from "@utils";
 
-export interface LancamentosFilterData {
-  initialDate: string | null;
-  finalDate: string | null;
-  initialAmount: number | null;
-  finalAmount: number | null;
-  searchText: string | null;
-  typeId: string | null;
-  accountId: string | null;
-  classification: ClassificationEnum | null;
-  isNotConfirmed: boolean | null;
-  dateReference: DateReferenceEnum;
-}
+const lancamentosFilterParsers = {
+  initialDate: parseAsString,
+  finalDate: parseAsString,
+  initialAmount: parseAsFloat,
+  finalAmount: parseAsFloat,
+  searchText: parseAsString,
+  typeId: parseAsString,
+  accountId: parseAsString,
+  classification: parseAsStringLiteral(Object.values(ClassificationEnum)),
+  isNotConfirmed: parseAsBoolean,
+  dateReference: parseAsStringLiteral(Object.values(DateReferenceEnum)),
+};
+
+export type LancamentosFilterData = inferParserType<
+  typeof lancamentosFilterParsers
+>;
+
+export const serializeLancamentosFilters = createSerializer(
+  lancamentosFilterParsers,
+);
 
 export function getDefaultFilters(): LancamentosFilterData {
   return {
@@ -33,22 +48,15 @@ export function getDefaultFilters(): LancamentosFilterData {
   };
 }
 
-interface LancamentosFilterStore {
-  filters: LancamentosFilterData;
-  setFilters: (all: LancamentosFilterData) => void;
-  clearFilter: () => void;
-}
+export function useLancamentosFilterStore() {
+  const [filters, setQueryStates] = useQueryStates(lancamentosFilterParsers, {
+    history: "push",
+  });
 
-export const useLancamentosFilterStore = create<LancamentosFilterStore>()(
-  persist(
-    (set) => ({
-      filters: getDefaultFilters(),
-      setFilters: (all) => set(() => ({ filters: all })),
-      clearFilter: () => set(() => ({ filters: getDefaultFilters() })),
-    }),
-    {
-      name: "lancamentos-filters",
-      partialize: (state) => ({ filters: state.filters }),
-    },
-  ),
-);
+  return {
+    filters,
+    search: serializeLancamentosFilters(filters),
+    setFilters: (all: LancamentosFilterData) => setQueryStates(all),
+    clearFilter: () => setQueryStates(getDefaultFilters()),
+  };
+}

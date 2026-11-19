@@ -1,7 +1,9 @@
 import { PieChart } from "@mui/x-charts/PieChart";
 import { Box, Stack, Typography } from "@mui/material";
+import { Link } from "react-router";
 
 import SectionCard from "@components/SectionCard";
+import { useGoTo } from "@hooks/useGoTo";
 import { formatCurrency } from "@utils";
 
 import type { GetStatisticMonthItemResponse } from "../api/types/GetStatisticMonthItemResponse";
@@ -11,6 +13,7 @@ interface ChartPieProps {
   title: string;
   subtitle?: string;
   innerRadius?: number;
+  getItemLink?: (item: GetStatisticMonthItemResponse) => string;
 }
 
 const CHART_SIZE = 200;
@@ -20,7 +23,10 @@ export default function ChartPie({
   title,
   subtitle,
   innerRadius = 55,
+  getItemLink,
 }: ChartPieProps) {
+  const { goTo } = useGoTo();
+
   const items = data.filter((item) => item.value > 0);
   const total = items.reduce((sum, item) => sum + item.value, 0);
 
@@ -60,6 +66,15 @@ export default function ChartPie({
                   valueFormatter: ({ value }) => formatCurrency(value),
                 },
               ]}
+              onItemClick={
+                getItemLink &&
+                ((event, _identifier, pieItem) => {
+                  const item = items.find((x) => x.id === pieItem.id);
+                  if (!item) return;
+                  goTo(getItemLink(item), event);
+                })
+              }
+              sx={getItemLink && { "& path": { cursor: "pointer" } }}
               hideLegend
               height={CHART_SIZE}
               width={CHART_SIZE}
@@ -88,6 +103,22 @@ export default function ChartPie({
                 direction="row"
                 alignItems="center"
                 gap={1.5}
+                {...(getItemLink && {
+                  component: Link,
+                  to: getItemLink(item),
+                  title: "Ver lançamentos",
+                })}
+                sx={{
+                  color: "inherit",
+                  textDecoration: "none",
+                  borderRadius: 1,
+                  mx: -1,
+                  px: 1,
+                  py: 0.25,
+                  ...(getItemLink && {
+                    "&:hover": { backgroundColor: "action.hover" },
+                  }),
+                }}
               >
                 <Box
                   sx={{

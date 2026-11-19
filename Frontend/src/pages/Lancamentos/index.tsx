@@ -35,7 +35,9 @@ import { DateReferenceEnum } from "./api/types/DateReferenceEnum";
 export default function Lancamentos() {
   const pageTitle = "Lançamentos";
 
-  const { filters, setFilters } = useLancamentosFilterStore();
+  const { filters, search, setFilters } = useLancamentosFilterStore();
+
+  const formState = { returnTo: paths.lancamentos(filters) };
 
   const { isNotConfirmed, ...restOfFilters } = filters;
 
@@ -69,6 +71,7 @@ export default function Lancamentos() {
             startIcon={<AddIcon />}
             component={Link}
             to={paths.lancamentosForm()}
+            state={formState}
           >
             Adicionar
           </Button>
@@ -89,7 +92,7 @@ export default function Lancamentos() {
             />
           }
         >
-          <FormFilter />
+          <FormFilter key={search} />
         </SectionCard>
 
         <Grid container spacing={2}>
@@ -199,6 +202,7 @@ export default function Lancamentos() {
                 <GridEditAction
                   key="edit-item"
                   to={paths.lancamentosForm(row.id)}
+                  state={formState}
                 />,
                 <GridActionsCellItem
                   key="delete-item"

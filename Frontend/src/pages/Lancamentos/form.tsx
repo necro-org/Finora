@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router";
+import { Link, useLocation, useParams } from "react-router";
 
 import PageContainer from "@components/PageContainer";
 import TextField from "@components/TextField";
@@ -70,7 +70,12 @@ export default function LancamentosForm() {
     useCreateFinancialEntry();
   const { mutateAsync: mutateAsyncUpdate, isPending: isPendingUpdate } =
     useUpdateFinancialEntry();
-  const { goToLancamentos } = useGoTo();
+  const { goTo } = useGoTo();
+
+  const location = useLocation();
+  const returnTo =
+    (location.state as { returnTo?: string } | null)?.returnTo ??
+    paths.lancamentos();
 
   const isLoading = _isLoading || isFetching;
   const isSubmitting = isPendingCreate || isPendingUpdate;
@@ -94,14 +99,14 @@ export default function LancamentosForm() {
     } else {
       await mutateAsyncCreate({ data: d, replicateUntilDate });
     }
-    goToLancamentos();
+    goTo(returnTo);
   }
 
   return (
     <PageContainer
       title={pageTitle}
       breadcrumbs={[
-        { title: "Lançamentos", path: "/lancamentos" },
+        { title: "Lançamentos", path: returnTo },
         { title: pageTitle },
       ]}
     >
@@ -180,11 +185,7 @@ export default function LancamentosForm() {
             )}
 
             <Stack direction="row" gap={1} justifyContent="end">
-              <Button
-                component={Link}
-                to={paths.lancamentos()}
-                variant="outlined"
-              >
+              <Button component={Link} to={returnTo} variant="outlined">
                 Cancelar
               </Button>
               <Button

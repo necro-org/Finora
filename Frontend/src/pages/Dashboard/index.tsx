@@ -1,12 +1,9 @@
 import { Grid, Typography } from "@mui/material";
 import { StaticDatePicker } from "@mui/x-date-pickers";
-import type { PickerValue } from "@mui/x-date-pickers/internals";
 import TrendingUpRoundedIcon from "@mui/icons-material/TrendingUpRounded";
 import TrendingDownRoundedIcon from "@mui/icons-material/TrendingDownRounded";
 import AccountBalanceWalletRoundedIcon from "@mui/icons-material/AccountBalanceWalletRounded";
 import SavingsRoundedIcon from "@mui/icons-material/SavingsRounded";
-import { useState } from "react";
-import dayjs from "dayjs";
 
 import PageContainer from "@components/PageContainer";
 import FetchingLoading from "@components/FetchingLoading";
@@ -17,7 +14,7 @@ import { formatCurrency, formatDate } from "@utils";
 import { ClassificationEnum } from "@pages/Lancamentos/api/types/ClassificationEnum";
 import { DateReferenceLabel } from "@pages/Lancamentos/api/types/DateReferenceEnum";
 import DateReferenceToggle from "@components/DateReferenceToggle";
-import { useDashboardPreferencesStore } from "@stores/dashboardPreferencesStore";
+import { useDashboardFilterStore } from "@stores/dashboardFilterStore";
 
 import { useDashboard } from "./queries/useDashboard";
 import ChartPie from "./components/ChartPie";
@@ -29,6 +26,10 @@ import UpcomingPaymentsCard from "./components/UpcomingPaymentsCard";
 import TopExpensesCard from "./components/TopExpensesCard";
 import ChartTypeEvolution from "./components/ChartTypeEvolution";
 import type { GetStatisticMonthItemResponse } from "./api/types/GetStatisticMonthItemResponse";
+import { paths } from "@libs/paths";
+import type { LancamentosFilterData } from "@stores/lancamentosFilterStore";
+
+const WITHOUT_TYPE_ID = "without-type";
 
 function summarize(classifications: GetStatisticMonthItemResponse[] = []) {
   const sumOf = (classification: ClassificationEnum) =>
@@ -45,14 +46,10 @@ function summarize(classifications: GetStatisticMonthItemResponse[] = []) {
 export default function Dashboard() {
   const pageTitle = "Painel";
 
-  const todayLocaleDate = dayjs().locale("pt-br");
-
-  const [dateYearMonth, setDateYearMonth] =
-    useState<PickerValue>(todayLocaleDate);
-
-  const selectedDate = dateYearMonth ?? todayLocaleDate;
-
-  const { dateReference, setDateReference } = useDashboardPreferencesStore();
+  const {
+    filters: { month: selectedDate, dateReference },
+    setFilters,
+  } = useDashboardFilterStore();
 
   const {
     data,
@@ -79,6 +76,23 @@ export default function Dashboard() {
     .locale("pt-br")
     .format("MMMM");
 
+  function getLancamentosLink(filters: Partial<LancamentosFilterData>) {
+    return paths.lancamentos({
+      initialDate: formatDate(selectedDate.startOf("month")),
+      finalDate: formatDate(selectedDate.endOf("month")),
+      dateReference,
+      ...filters,
+    });
+  }
+
+  function getTypeLink(classification: ClassificationEnum) {
+    return (item: GetStatisticMonthItemResponse) =>
+      getLancamentosLink({
+        classification,
+        typeId: item.id === WITHOUT_TYPE_ID ? null : item.id,
+      });
+  }
+
   const periodLabel = selectedDate.locale("pt-br").format("MMMM [de] YYYY");
   const periodTitle =
     periodLabel.charAt(0).toUpperCase() + periodLabel.slice(1);
@@ -89,7 +103,7 @@ export default function Dashboard() {
       actions={
         <DateReferenceToggle
           value={dateReference}
-          onChange={setDateReference}
+          onChange={(value) => setFilters({ dateReference: value })}
         />
       }
     >
@@ -179,8 +193,8 @@ export default function Dashboard() {
           >
             <StaticDatePicker
               views={["year", "month"]}
-              onChange={setDateYearMonth}
-              value={dateYearMonth}
+              onChange={(value) => setFilters({ month: value })}
+              value={selectedDate}
               slots={{
                 actionBar: () => <div />,
                 toolbar: () => <div />,
@@ -201,6 +215,11 @@ export default function Dashboard() {
             data={classifications}
             title="Receitas x Despesas"
             subtitle="Resultado do mês por classificação"
+            getItemLink={(item) =>
+              getLancamentosLink({
+                classification: item.id as ClassificationEnum,
+              })
+            }
           />
         </Grid>
 
@@ -219,6 +238,7 @@ export default function Dashboard() {
             data={data?.expensesByType || []}
             title="Despesas por tipo"
             subtitle="Onde o dinheiro foi gasto no mês"
+            getItemLink={getTypeLink(ClassificationEnum.Expense)}
           />
         </Grid>
         <Grid size={{ xs: 12, lg: 6 }}>
@@ -226,6 +246,7 @@ export default function Dashboard() {
             data={data?.revenuesByType || []}
             title="Receitas por tipo"
             subtitle="De onde o dinheiro veio no mês"
+            getItemLink={getTypeLink(ClassificationEnum.Revenue)}
           />
         </Grid>
 

@@ -8,10 +8,14 @@ import { Link } from "react-router";
 type GridEditActionProps = Omit<
   Extract<GridActionsCellItemProps, { showInMenu?: false }>,
   "icon" | "label"
-> & { to: string };
+> & { to: string; state?: unknown };
 
-export default function GridEditAction({ to, ...props }: GridEditActionProps) {
-  const linkProps = { component: Link, to };
+export default function GridEditAction({
+  to,
+  state,
+  ...props
+}: GridEditActionProps) {
+  const linkProps = { component: Link, to, state };
 
   return (
     <GridActionsCellItem

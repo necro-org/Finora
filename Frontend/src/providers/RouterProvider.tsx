@@ -8,6 +8,7 @@ import PublicLayout from "@layouts/public-layout";
 
 import Dashboard from "@pages/Dashboard";
 import Lancamentos from "@pages/Lancamentos";
+import { lancamentosLoader } from "@pages/Lancamentos/loader";
 import LancamentosForm from "@pages/Lancamentos/form";
 import Tipos from "@pages/Tipos";
 import TiposForm from "@pages/Tipos/form";
@@ -42,6 +43,7 @@ const router = createBrowserRouter([
       {
         path: "/lancamentos",
         Component: Lancamentos,
+        loader: lancamentosLoader,
       },
       {
         path: "/lancamentos/novo",

@@ -5,6 +5,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import RouterProvider from "@providers/RouterProvider";
 import ToastProvider from "@providers/ToastProvider";
 import AuthProvider from "@providers/AuthProvider";
+import NuqsProvider from "@providers/NuqsProvider";
 
 export default function App() {
   return (
@@ -14,7 +15,9 @@ export default function App() {
           <ToastProvider>
             <CssBaseline />
             <AuthProvider>
-              <RouterProvider />
+              <NuqsProvider>
+                <RouterProvider />
+              </NuqsProvider>
             </AuthProvider>
           </ToastProvider>
         </LocalizationProvider>
