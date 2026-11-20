@@ -1,5 +1,6 @@
 import { LinearProgress, Stack, Typography } from "@mui/material";
 import dayjs from "dayjs";
+import { Link } from "react-router";
 
 import SectionCard from "@components/SectionCard";
 import { formatCurrency } from "@utils";
@@ -8,6 +9,7 @@ import type { UpcomingPaymentDto } from "../api/types/UpcomingPaymentDto";
 
 interface UpcomingPaymentsCardProps {
   data: UpcomingPaymentDto[];
+  getItemLink?: (item: UpcomingPaymentDto) => string;
 }
 
 function formatMonth({ year, month }: UpcomingPaymentDto) {
@@ -17,6 +19,7 @@ function formatMonth({ year, month }: UpcomingPaymentDto) {
 
 export default function UpcomingPaymentsCard({
   data,
+  getItemLink,
 }: UpcomingPaymentsCardProps) {
   const total = data.reduce((sum, item) => sum + item.amount, 0);
   const highestAmount = Math.max(...data.map((item) => item.amount), 0);
@@ -55,7 +58,26 @@ export default function UpcomingPaymentsCard({
 
           <Stack gap={1.5}>
             {data.map((item) => (
-              <Stack key={`${item.year}-${item.month}`} gap={0.5}>
+              <Stack
+                key={`${item.year}-${item.month}`}
+                gap={0.5}
+                {...(getItemLink && {
+                  component: Link,
+                  to: getItemLink(item),
+                  title: "Ver lançamentos",
+                })}
+                sx={{
+                  color: "inherit",
+                  textDecoration: "none",
+                  borderRadius: 1,
+                  mx: -1,
+                  px: 1,
+                  py: 0.5,
+                  ...(getItemLink && {
+                    "&:hover": { backgroundColor: "action.hover" },
+                  }),
+                }}
+              >
                 <Stack
                   direction="row"
                   justifyContent="space-between"

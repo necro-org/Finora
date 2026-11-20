@@ -4,6 +4,7 @@ import TrendingUpRoundedIcon from "@mui/icons-material/TrendingUpRounded";
 import TrendingDownRoundedIcon from "@mui/icons-material/TrendingDownRounded";
 import AccountBalanceWalletRoundedIcon from "@mui/icons-material/AccountBalanceWalletRounded";
 import SavingsRoundedIcon from "@mui/icons-material/SavingsRounded";
+import dayjs, { type Dayjs } from "dayjs";
 
 import PageContainer from "@components/PageContainer";
 import FetchingLoading from "@components/FetchingLoading";
@@ -12,7 +13,10 @@ import StatCard from "@components/StatCard";
 import useClassificationColor from "@hooks/useClassificationColor";
 import { formatCurrency, formatDate } from "@utils";
 import { ClassificationEnum } from "@pages/Lancamentos/api/types/ClassificationEnum";
-import { DateReferenceLabel } from "@pages/Lancamentos/api/types/DateReferenceEnum";
+import {
+  DateReferenceEnum,
+  DateReferenceLabel,
+} from "@pages/Lancamentos/api/types/DateReferenceEnum";
 import DateReferenceToggle from "@components/DateReferenceToggle";
 import { useDashboardFilterStore } from "@stores/dashboardFilterStore";
 
@@ -26,10 +30,13 @@ import UpcomingPaymentsCard from "./components/UpcomingPaymentsCard";
 import TopExpensesCard from "./components/TopExpensesCard";
 import ChartTypeEvolution from "./components/ChartTypeEvolution";
 import type { GetStatisticMonthItemResponse } from "./api/types/GetStatisticMonthItemResponse";
+import type { GetStatisticMonthAccountResponse } from "./api/types/GetStatisticMonthAccountResponse";
+import type { UpcomingPaymentDto } from "./api/types/UpcomingPaymentDto";
 import { paths } from "@libs/paths";
 import type { LancamentosFilterData } from "@stores/lancamentosFilterStore";
 
 const WITHOUT_TYPE_ID = "without-type";
+const WITHOUT_ACCOUNT_ID = "without-account";
 
 function summarize(classifications: GetStatisticMonthItemResponse[] = []) {
   const sumOf = (classification: ClassificationEnum) =>
@@ -76,10 +83,13 @@ export default function Dashboard() {
     .locale("pt-br")
     .format("MMMM");
 
-  function getLancamentosLink(filters: Partial<LancamentosFilterData>) {
+  function getLancamentosLink(
+    filters: Partial<LancamentosFilterData>,
+    month: Dayjs = selectedDate,
+  ) {
     return paths.lancamentos({
-      initialDate: formatDate(selectedDate.startOf("month")),
-      finalDate: formatDate(selectedDate.endOf("month")),
+      initialDate: formatDate(month.startOf("month")),
+      finalDate: formatDate(month.endOf("month")),
       dateReference,
       ...filters,
     });
@@ -91,6 +101,26 @@ export default function Dashboard() {
         classification,
         typeId: item.id === WITHOUT_TYPE_ID ? null : item.id,
       });
+  }
+
+  function getAccountLink(
+    item: GetStatisticMonthAccountResponse,
+    classification: ClassificationEnum,
+  ) {
+    return getLancamentosLink({
+      classification,
+      accountId: item.id === WITHOUT_ACCOUNT_ID ? null : item.id,
+    });
+  }
+
+  function getUpcomingPaymentLink({ year, month }: UpcomingPaymentDto) {
+    return getLancamentosLink(
+      {
+        classification: ClassificationEnum.Expense,
+        dateReference: DateReferenceEnum.EntryDate,
+      },
+      dayjs(new Date(year, month - 1, 1)),
+    );
   }
 
   const periodLabel = selectedDate.locale("pt-br").format("MMMM [de] YYYY");
@@ -230,7 +260,10 @@ export default function Dashboard() {
           />
         </Grid>
         <Grid size={{ xs: 12, lg: 4 }}>
-          <UpcomingPaymentsCard data={data?.upcomingPayments || []} />
+          <UpcomingPaymentsCard
+            data={data?.upcomingPayments || []}
+            getItemLink={getUpcomingPaymentLink}
+          />
         </Grid>
 
         <Grid size={{ xs: 12, lg: 6 }}>
@@ -251,7 +284,10 @@ export default function Dashboard() {
         </Grid>
 
         <Grid size={{ xs: 12, lg: 6 }}>
-          <ChartAccounts data={data?.accounts || []} />
+          <ChartAccounts
+            data={data?.accounts || []}
+            getItemLink={getAccountLink}
+          />
         </Grid>
         <Grid size={{ xs: 12, lg: 6 }}>
           <TopExpensesCard
@@ -264,6 +300,12 @@ export default function Dashboard() {
           <ChartBar
             data={data?.classificationsOfYear || []}
             year={selectedDate.year()}
+            getItemLink={(monthNumber, classification) =>
+              getLancamentosLink(
+                { classification },
+                selectedDate.month(monthNumber - 1),
+              )
+            }
           />
         </Grid>
 

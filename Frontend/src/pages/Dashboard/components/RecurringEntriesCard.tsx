@@ -1,4 +1,10 @@
-import { LinearProgress, Stack, Tooltip, Typography } from "@mui/material";
+import {
+  LinearProgress,
+  Link as MuiLink,
+  Stack,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -6,7 +12,10 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableRow from "@mui/material/TableRow";
 
+import { Link } from "react-router";
+
 import SectionCard from "@components/SectionCard";
+import { paths } from "@libs/paths";
 import AmountText from "@components/AmountText";
 import RecurringStatusChip from "@components/RecurringStatusChip";
 import { formatCurrency, formatDateToShow } from "@utils";
@@ -120,16 +129,32 @@ export default function RecurringEntriesCard({
                 {data.map((row) => (
                   <TableRow
                     key={row.id}
+                    hover
                     sx={{
                       "&:last-child td, &:last-child th": { border: 0 },
                       opacity: row.isPaid ? 0.6 : 1,
+                      position: "relative",
                     }}
                   >
                     <TableCell sx={{ whiteSpace: "nowrap" }}>
                       {formatDateToShow(row.date)}
                     </TableCell>
                     <TableCell sx={{ width: "100%" }}>
-                      {row.description ?? "—"}
+                      <MuiLink
+                        component={Link}
+                        to={paths.recurringEntriesForm(row.id)}
+                        color="inherit"
+                        underline="none"
+                        sx={{
+                          "&::after": {
+                            content: '""',
+                            position: "absolute",
+                            inset: 0,
+                          },
+                        }}
+                      >
+                        {row.description ?? "—"}
+                      </MuiLink>
                     </TableCell>
                     <TableCell align="right" sx={{ whiteSpace: "nowrap" }}>
                       <AmountText

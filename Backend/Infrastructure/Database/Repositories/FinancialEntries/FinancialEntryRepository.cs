@@ -84,6 +84,8 @@ public class FinancialEntryRepository : IFinancialEntryRepository
         return result
             .Select(x => new ChartDataOfYearDto(
                 CultureInfo.GetCultureInfo("pt-BR").DateTimeFormat.GetAbbreviatedMonthName(x.Month),
+                x.Month,
+                x.Classification,
                 x.Classification.GetName(),
                 x.Classification.GetColor(),
                 x.Value))
