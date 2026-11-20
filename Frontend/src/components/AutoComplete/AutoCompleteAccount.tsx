@@ -30,6 +30,7 @@ export default function AutoCompleteAccount({
       name={name}
       idField="id"
       renderOptions={(d) => d.name}
+      getOptionColor={(d) => d.color}
       onRefetch={refetch}
       required={required}
       onChange={onChange}

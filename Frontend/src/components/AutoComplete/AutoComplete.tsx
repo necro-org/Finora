@@ -1,12 +1,15 @@
-import { Autocomplete, CircularProgress, TextField } from "@mui/material";
+import { Autocomplete, Box, CircularProgress, TextField } from "@mui/material";
 import { useEffect } from "react";
 import { Controller, useFormContext, type FieldError } from "react-hook-form";
+
+import ColorDot from "@components/ColorDot";
 
 interface AutoCompleteProps<TData> {
   label: string;
   name: string;
   options: TData[];
   renderOptions: (d: TData) => string;
+  getOptionColor?: (d: TData) => string | null | undefined;
   onRefetch?: () => void;
   isLoading?: boolean;
   idField: keyof TData extends string ? keyof TData : never;
@@ -21,6 +24,7 @@ function AutoCompleteDefault<TData>({
   name,
   options,
   renderOptions,
+  getOptionColor,
   onRefetch,
   isLoading,
   idField,
@@ -29,6 +33,7 @@ function AutoCompleteDefault<TData>({
   value,
   error,
 }: AutoCompleteProps<TData>) {
+  const selectedOption = options.find((d) => d[idField] === value) || null;
   useEffect(() => {
     if (value && options.length <= 0 && onRefetch) {
       onRefetch();
@@ -41,8 +46,22 @@ function AutoCompleteDefault<TData>({
       onChange={(_, obj) =>
         onChange && onChange(obj ? (obj[idField] as string) : null)
       }
-      value={options.find((d) => d[idField] === value) || null}
+      value={selectedOption}
       getOptionLabel={renderOptions}
+      renderOption={
+        getOptionColor &&
+        (({ key, ...optionProps }, option) => (
+          <Box
+            component="li"
+            key={key}
+            {...optionProps}
+            sx={{ display: "flex", alignItems: "center", gap: 1.5 }}
+          >
+            <ColorDot color={getOptionColor(option)} />
+            {renderOptions(option)}
+          </Box>
+        ))
+      }
       getOptionKey={(d) => d[idField] as string}
       options={options}
       loading={isLoading}
@@ -63,6 +82,15 @@ function AutoCompleteDefault<TData>({
           slotProps={{
             input: {
               ...params.InputProps,
+              startAdornment:
+                getOptionColor && selectedOption ? (
+                  <ColorDot
+                    color={getOptionColor(selectedOption)}
+                    sx={{ ml: 0.5 }}
+                  />
+                ) : (
+                  params.InputProps.startAdornment
+                ),
               endAdornment: (
                 <>
                   {isLoading ? (

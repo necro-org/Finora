@@ -1,4 +1,5 @@
 import { ClassificationList } from "@pages/Lancamentos/api/types/ClassificationEnum";
+import useClassificationColor from "@hooks/useClassificationColor";
 import AutoComplete from "./AutoComplete";
 
 interface AutoCompleteClassificacaoProps {
@@ -13,6 +14,8 @@ export default function AutoCompleteClassificacao({
   onChange,
   value,
 }: AutoCompleteClassificacaoProps) {
+  const getClassificationColor = useClassificationColor();
+
   return (
     <AutoComplete
       options={ClassificationList}
@@ -20,6 +23,7 @@ export default function AutoCompleteClassificacao({
       name={name}
       idField="value"
       renderOptions={(d) => d.label}
+      getOptionColor={(d) => getClassificationColor(d.value)}
       required={required}
       onChange={onChange}
       value={value}
