@@ -5,6 +5,8 @@ import {
 } from "@mui/material/styles";
 import type {} from "@mui/x-data-grid/themeAugmentation";
 import type {} from "@mui/x-date-pickers/themeAugmentation";
+import type {} from "@mui/x-charts/themeAugmentation";
+import { legendClasses } from "@mui/x-charts/ChartsLegend";
 
 interface ThemeProviderProps {
   children: React.ReactNode;
@@ -231,6 +233,18 @@ export default function ThemeProvider(props: ThemeProviderProps) {
         styleOverrides: {
           root: {
             fontWeight: 600,
+          },
+        },
+      },
+      MuiChartsLegend: {
+        defaultProps: {
+          toggleVisibilityOnClick: true,
+        },
+        styleOverrides: {
+          root: {
+            [`& .${legendClasses.hidden} .${legendClasses.label}`]: {
+              textDecoration: "line-through",
+            },
           },
         },
       },

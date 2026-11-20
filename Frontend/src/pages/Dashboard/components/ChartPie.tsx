@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { PieChart } from "@mui/x-charts/PieChart";
-import { Box, Stack, Typography } from "@mui/material";
+import { Box, ButtonBase, Stack, Tooltip, Typography } from "@mui/material";
 import { Link } from "react-router";
 
 import SectionCard from "@components/SectionCard";
@@ -27,8 +28,17 @@ export default function ChartPie({
 }: ChartPieProps) {
   const { goTo } = useGoTo();
 
+  const [hiddenIds, setHiddenIds] = useState<string[]>([]);
+
+  function toggleItem(id: string) {
+    setHiddenIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    );
+  }
+
   const items = data.filter((item) => item.value > 0);
-  const total = items.reduce((sum, item) => sum + item.value, 0);
+  const visibleItems = items.filter((item) => !hiddenIds.includes(item.id));
+  const total = visibleItems.reduce((sum, item) => sum + item.value, 0);
 
   return (
     <SectionCard title={title} subtitle={subtitle} sx={{ height: "100%" }}>
@@ -54,7 +64,7 @@ export default function ChartPie({
             <PieChart
               series={[
                 {
-                  data: items.map((item) => ({
+                  data: visibleItems.map((item) => ({
                     id: item.id,
                     value: item.value,
                     label: item.label,
@@ -97,56 +107,93 @@ export default function ChartPie({
             gap={1.25}
             sx={{ flex: 1, width: "100%", minWidth: 0, maxWidth: 360 }}
           >
-            {items.map((item) => (
-              <Stack
-                key={item.id}
-                direction="row"
-                alignItems="center"
-                gap={1.5}
-                {...(getItemLink && {
-                  component: Link,
-                  to: getItemLink(item),
-                  title: "Ver lançamentos",
-                })}
-                sx={{
-                  color: "inherit",
-                  textDecoration: "none",
-                  borderRadius: 1,
-                  mx: -1,
-                  px: 1,
-                  py: 0.25,
-                  ...(getItemLink && {
-                    "&:hover": { backgroundColor: "action.hover" },
-                  }),
-                }}
-              >
-                <Box
-                  sx={{
-                    width: 10,
-                    height: 10,
-                    borderRadius: "50%",
-                    flexShrink: 0,
-                    backgroundColor: item.color || "grey.400",
-                  }}
-                />
-                <Typography variant="body2" noWrap sx={{ flex: 1 }}>
-                  {item.label}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  {((item.value / total) * 100).toFixed(0)}%
-                </Typography>
-                <Typography
-                  variant="body2"
-                  fontWeight={600}
-                  sx={{
-                    fontVariantNumeric: "tabular-nums",
-                    whiteSpace: "nowrap",
-                  }}
+            {items.map((item) => {
+              const isHidden = hiddenIds.includes(item.id);
+              const color = item.color || "grey.400";
+
+              return (
+                <Stack
+                  key={item.id}
+                  direction="row"
+                  alignItems="center"
+                  gap={0.5}
+                  sx={{ mx: -1, opacity: isHidden ? 0.5 : 1 }}
                 >
-                  {formatCurrency(item.value)}
-                </Typography>
-              </Stack>
-            ))}
+                  <Tooltip title={isHidden ? "Mostrar" : "Ocultar"}>
+                    <ButtonBase
+                      onClick={() => toggleItem(item.id)}
+                      aria-pressed={!isHidden}
+                      aria-label={`${isHidden ? "Mostrar" : "Ocultar"} ${item.label}`}
+                      sx={{
+                        p: 0.75,
+                        borderRadius: "50%",
+                        flexShrink: 0,
+                        "&:hover": { backgroundColor: "action.hover" },
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: 10,
+                          height: 10,
+                          borderRadius: "50%",
+                          border: 2,
+                          borderColor: color,
+                          backgroundColor: isHidden ? "transparent" : color,
+                        }}
+                      />
+                    </ButtonBase>
+                  </Tooltip>
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    gap={1.5}
+                    {...(getItemLink && {
+                      component: Link,
+                      to: getItemLink(item),
+                      title: "Ver lançamentos",
+                    })}
+                    sx={{
+                      flex: 1,
+                      minWidth: 0,
+                      color: "inherit",
+                      textDecoration: "none",
+                      borderRadius: 1,
+                      px: 0.5,
+                      py: 0.25,
+                      ...(getItemLink && {
+                        "&:hover": { backgroundColor: "action.hover" },
+                      }),
+                    }}
+                  >
+                    <Typography
+                      variant="body2"
+                      noWrap
+                      sx={{
+                        flex: 1,
+                        textDecoration: isHidden ? "line-through" : "none",
+                      }}
+                    >
+                      {item.label}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {isHidden
+                        ? "—"
+                        : `${((item.value / total) * 100).toFixed(0)}%`}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      fontWeight={600}
+                      sx={{
+                        fontVariantNumeric: "tabular-nums",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {formatCurrency(item.value)}
+                    </Typography>
+                  </Stack>
+                </Stack>
+              );
+            })}
           </Stack>
         </Stack>
       )}
